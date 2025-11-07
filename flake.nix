@@ -3,6 +3,12 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
+    # Local path to your tooling repo (adjust or replace with Git URL)
+    #formol.url = "path:/home/user/workspace/AT-formol/images/nix";
+    formol = {
+      url = "github:FORMIND-Consulting/AT-formol?dir=images/nix";
+      rev = "main";
+    };
   };
 
   outputs = {
@@ -71,9 +77,14 @@
         lib.nixosSystem
         {
           inherit pkgs system;
+          specialArgs = {
+            # Pass the flake input so modules can import tool lists
+            formol = self.inputs.formol;
+          };
           modules = [
             self.nixosModules.default
             self.nixosProfiles.default
+            ./profiles/formol-tools.nix
             ./examples/configuration.nix
           ];
         };
