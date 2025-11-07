@@ -25,7 +25,7 @@ in
 
     src = fetchFromGitHub {
       owner = "QubesOS";
-      repo = "qubes-core-qubesdb";
+      repo = "qubes-core-agent-linux";
       rev = "v${packageInfo.version}";
       hash = packageInfo.hash;
     };
