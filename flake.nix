@@ -30,6 +30,9 @@
 
     pkgs = import nixpkgs {
       inherit system;
+      config = {
+        permittedInsecurePackages = [ "resholve-0.10.6" ];
+      };
       overlays = [
         qubesPackages
       ];

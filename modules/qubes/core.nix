@@ -30,8 +30,9 @@ in
 
         services.timesyncd.enable = lib.mkOverride 900 false;
 
+        # Moved to root flake.nix
         # Resholve uses python2
-        nixpkgs.config.permittedInsecurePackages = [ "resholve-0.10.6" ];
+        # nixpkgs.config.permittedInsecurePackages = [ "resholve-0.10.6" ];
 
 
         # TODO make the username configurable?
