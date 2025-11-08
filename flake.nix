@@ -6,8 +6,7 @@
     # Local path to your tooling repo (adjust or replace with Git URL)
     #formol.url = "path:/home/user/workspace/AT-formol/images/nix";
     formol = {
-      url = "github:FORMIND-Consulting/AT-formol?dir=images/nix";
-      rev = "main";
+      url = "ssh+git://git@github.com/FORMIND-Consulting/AT-formol";
     };
   };
 
