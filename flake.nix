@@ -5,9 +5,9 @@
     nixpkgs.url = "nixpkgs/nixos-unstable";
     # Local path to your tooling repo (adjust or replace with Git URL)
     #formol.url = "path:/home/user/workspace/AT-formol/images/nix";
-    formol = {
-      url = "ssh+git://git@github.com/FORMIND-Consulting/AT-formol";
-    };
+    #formol = {
+    #  url = "ssh+git://git@github.com/FORMIND-Consulting/AT-formol";
+    #};
   };
 
   outputs = {
