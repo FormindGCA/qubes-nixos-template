@@ -76,14 +76,14 @@
         lib.nixosSystem
         {
           inherit pkgs system;
-          specialArgs = {
-            # Pass the flake input so modules can import tool lists
-            formol = self.inputs.formol;
-          };
+          #specialArgs = {
+          #  # Pass the flake input so modules can import tool lists
+          #  formol = self.inputs.formol;
+          #};
           modules = [
             self.nixosModules.default
             self.nixosProfiles.default
-            ./profiles/formol-tools.nix
+            #./profiles/formol-tools.nix
             ./examples/configuration.nix
           ];
         };
