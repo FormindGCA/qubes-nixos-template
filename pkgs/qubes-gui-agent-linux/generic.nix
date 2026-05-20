@@ -60,6 +60,7 @@ resholve.mkDerivation rec {
       automake
       autoconf
       libtool
+      libunistring
       pam
       pulseaudio
       pipewire
