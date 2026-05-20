@@ -5,7 +5,7 @@
 }:
 callPackage ./generic.nix {
   version = "4.2.45";
-  hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+  hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
   inherit enableNetworking;
   rev = rev;
 }

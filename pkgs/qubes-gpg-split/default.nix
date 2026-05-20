@@ -15,7 +15,7 @@ resholve.mkDerivation rec {
     owner = "QubesOS";
     repo = "qubes-app-linux-split-gpg";
     rev = if rev != null then rev else "v${version}";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
   };
 
   postPatch = ''
