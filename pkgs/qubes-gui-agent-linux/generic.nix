@@ -35,6 +35,7 @@
   xfce,
   xorg,
   zenity,
+  dbus,
   version,
   hash,
   rev ? null,
@@ -89,6 +90,7 @@ resholve.mkDerivation rec {
       zenity
       python3Packages.xcffib
       systemd
+      dbus
       xfce.xfconf
       # xdg-user-dirs-update
     ]
@@ -205,6 +207,7 @@ resholve.mkDerivation rec {
         "${qubes-core-agent-linux}/lib/qubes/init/functions"
         bash
         coreutils
+        dbus
         gnused
         qubes-core-qubesdb
         systemd
