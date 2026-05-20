@@ -76,10 +76,6 @@
       "lib/qubes/init/resize-rootfs-if-needed.sh"
       "lib/qubes/resize-rootfs"
       "lib/qubes/update-proxy-configs"
-      "bin/qvm-copy"
-      "bin/qvm-copy-to-vm"
-      "bin/qvm-move"
-      "bin/qvm-move-to-vm"
       "bin/qvm-open-in-dvm"
       "bin/qvm-run-vm"
     ];
