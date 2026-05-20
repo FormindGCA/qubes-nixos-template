@@ -19,7 +19,7 @@
 }:
 resholve.mkDerivation rec {
   pname = "qubes-core-qrexec";
-  inherit version;
+  #inherit version;
 
   src = fetchFromGitHub {
     owner = "QubesOS";

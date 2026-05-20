@@ -9,7 +9,7 @@
 }:
 stdenv.mkDerivation rec {
   pname = "qubes-core-vchan-xen";
-  inherit version;
+  #inherit version;
 
   src = fetchFromGitHub {
     owner = "QubesOS";
