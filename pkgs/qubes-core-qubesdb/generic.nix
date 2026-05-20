@@ -12,6 +12,7 @@
   systemd,
   version,
   hash,
+  rev ? null,
 }: let
   qubesdb-cmds = "qubesdb-read qubesdb-write qubesdb-rm qubesdb-multiread qubesdb-list qubesdb-watch";
 in
@@ -22,7 +23,7 @@ in
     src = fetchFromGitHub {
       owner = "QubesOS";
       repo = pname;
-      rev = "v${version}";
+      rev = if rev != null then rev else "v${version}";
       inherit hash;
     };
 

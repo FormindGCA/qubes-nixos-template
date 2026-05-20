@@ -13,6 +13,7 @@
   usbutils,
   version,
   hash,
+  rev ? null,
 }:
 resholve.mkDerivation rec {
   pname = "qubes-usb-proxy";
@@ -21,7 +22,7 @@ resholve.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "QubesOS";
     repo = "qubes-app-linux-usb-proxy";
-    rev = "v${version}";
+    rev = if rev != null then rev else "v${version}";
     inherit hash;
   };
 

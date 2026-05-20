@@ -12,17 +12,20 @@
   }: let
     lib = nixpkgs.lib;
     system = "x86_64-linux";
+    # Set this to "release4.3" to build package sources from the Qubes 4.3 branch.
+    # Leave null to keep the current pinned v<version> tags.
+    qubesBranch = "release4.3";
     qubesPackages = final: prev: {
-      qubes-core-qubesdb = prev.callPackage ./pkgs/qubes-core-qubesdb {};
-      qubes-core-vchan-xen = prev.callPackage ./pkgs/qubes-core-vchan-xen {};
-      qubes-core-qrexec = prev.callPackage ./pkgs/qubes-core-qrexec {};
-      qubes-core-agent-linux = prev.callPackage ./pkgs/qubes-core-agent-linux {};
-      qubes-linux-utils = prev.callPackage ./pkgs/qubes-linux-utils {};
-      qubes-gui-common = prev.callPackage ./pkgs/qubes-gui-common {};
-      qubes-gui-agent-linux = prev.callPackage ./pkgs/qubes-gui-agent-linux {};
+      qubes-core-qubesdb = prev.callPackage ./pkgs/qubes-core-qubesdb { rev = qubesBranch; };
+      qubes-core-vchan-xen = prev.callPackage ./pkgs/qubes-core-vchan-xen { rev = qubesBranch; };
+      qubes-core-qrexec = prev.callPackage ./pkgs/qubes-core-qrexec { rev = qubesBranch; };
+      qubes-core-agent-linux = prev.callPackage ./pkgs/qubes-core-agent-linux { rev = qubesBranch; };
+      qubes-linux-utils = prev.callPackage ./pkgs/qubes-linux-utils { rev = qubesBranch; };
+      qubes-gui-common = prev.callPackage ./pkgs/qubes-gui-common { rev = qubesBranch; };
+      qubes-gui-agent-linux = prev.callPackage ./pkgs/qubes-gui-agent-linux { rev = qubesBranch; };
       qubes-sshd = prev.callPackage ./pkgs/qubes-sshd {};
-      qubes-usb-proxy = prev.callPackage ./pkgs/qubes-usb-proxy {};
-      qubes-gpg-split = prev.callPackage ./pkgs/qubes-gpg-split {};
+      qubes-usb-proxy = prev.callPackage ./pkgs/qubes-usb-proxy { rev = qubesBranch; };
+      qubes-gpg-split = prev.callPackage ./pkgs/qubes-gpg-split { rev = qubesBranch; };
     };
     patched-nix-update = final: prev: {
       nix-update =

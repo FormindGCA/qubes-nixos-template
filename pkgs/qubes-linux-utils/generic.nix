@@ -16,6 +16,7 @@
   xen,
   version,
   hash,
+  rev ? null,
 }: let
   name = "qubes-linux-utils";
   resholved = resholve.mkDerivation rec {
@@ -25,7 +26,7 @@
     src = fetchFromGitHub {
       owner = "QubesOS";
       repo = name;
-      rev = "v${version}";
+      rev = if rev != null then rev else "v${version}";
       inherit hash;
     };
 

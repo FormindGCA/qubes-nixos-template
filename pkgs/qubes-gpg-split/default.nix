@@ -5,6 +5,7 @@
   qubes-core-qrexec,
   gnupg,
   pandoc,
+  rev ? null,
 }:
 resholve.mkDerivation rec {
   pname = "qubes-gpg-split";
@@ -13,7 +14,7 @@ resholve.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "QubesOS";
     repo = "qubes-app-linux-split-gpg";
-    rev = "v${version}";
+    rev = if rev != null then rev else "v${version}";
     hash = "sha256-iM0SqA1Dy5yK3GRNaR/nxkMCifrNNBu5EaVVca42XZU=";
   };
 

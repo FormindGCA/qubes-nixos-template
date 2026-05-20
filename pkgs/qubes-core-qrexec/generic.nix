@@ -15,6 +15,7 @@
   util-linux,
   version,
   hash,
+  rev ? null,
 }:
 resholve.mkDerivation rec {
   pname = "qubes-core-qrexec";
@@ -23,7 +24,7 @@ resholve.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "QubesOS";
     repo = pname;
-    rev = "v${version}";
+    rev = if rev != null then rev else "v${version}";
     inherit hash;
   };
 

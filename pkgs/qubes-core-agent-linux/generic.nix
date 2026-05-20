@@ -55,6 +55,7 @@
   enableNetworking ? false,
   version,
   hash,
+  rev ? null,
 }: let
   scripts_using_functions = [
     "lib/qubes/init/qubes-early-vm-config.sh"
@@ -92,7 +93,7 @@ in
     src = fetchFromGitHub {
       owner = "QubesOS";
       repo = "qubes-core-agent-linux";
-      rev = "v${version}";
+      rev = if rev != null then rev else "v${version}";
       inherit hash;
     };
 

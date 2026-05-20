@@ -4,6 +4,7 @@
   fetchFromGitHub,
   version,
   hash,
+  rev ? null,
 }:
 stdenv.mkDerivation rec {
   pname = "qubes-gui-common";
@@ -12,7 +13,7 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "QubesOS";
     repo = pname;
-    rev = "v${version}";
+    rev = if rev != null then rev else "v${version}";
     inherit hash;
   };
 
