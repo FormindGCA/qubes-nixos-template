@@ -342,12 +342,17 @@ in
           ++ lib.optional enableNetworking "lib/qubes/init/network-uplink-wait.sh"
           ++ lib.optional enableNetworking "lib/qubes/setup-ip";
         interpreter = "none";
-        fake.external =
-          # guarded by check for /sys/fs/selinux
-          ["chcon" "restorecon"]
-          # guarded by check for
-          ++ ["kdialog"]
-          ++ lib.optional (!enableNetworking) "ip";
+        fake = {
+          external =
+            # guarded by check for /sys/fs/selinux
+            ["chcon" "restorecon"]
+            # guarded by check for
+            ++ ["kdialog"]
+            ++ lib.optional (!enableNetworking) "ip";
+          source = [
+            "lib/qubes/init/mount-dirs.sh"
+          ];
+        };
         fix = {
           "/bin/bash" = true;
           "/usr/bin/qubes-vmexec" = true;
