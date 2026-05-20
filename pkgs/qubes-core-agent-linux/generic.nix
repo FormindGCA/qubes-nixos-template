@@ -183,6 +183,9 @@ in
     # - figure out how to adapt service dropins?
     installPhase =
       ''
+        # Patch shebangs
+        patchShebangs "$out/etc/qubes-rpc"
+
         # install -D -m 0644 -- "boot/grub.qubes" "$out/etc/default/grub.qubes"
         make install-corevm \
             PYTHON_PREFIX_ARG="--prefix ." \
@@ -271,9 +274,6 @@ in
 
         rm -rf "$out/usr/bin"
         rm -rf "$out/var/run"
-
-        # Patch shebangs
-        patchShebangs "$out/etc/qubes-rpc"
       ''
       + lib.optionalString (!enableNetworking) ''
         # mock update-proxy-configs with an empty script
