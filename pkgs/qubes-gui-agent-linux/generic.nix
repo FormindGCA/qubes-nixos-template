@@ -10,6 +10,7 @@
   gnugrep,
   coreutils,
   libtool,
+  libunistring,
   libXt,
   lsb-release,
   git,
