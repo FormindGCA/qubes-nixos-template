@@ -406,6 +406,9 @@ in
           "/rw/config/qubes_ip_change_hook" = enableNetworking;
           "/rw/config/qubes-ip-change-hook" = enableNetworking;
           "/run/wrappers/bin/qfile-unpacker" = true;
+
+          # allow the dynamic command used in mount-dirs.sh
+          "$mount_home" = true;
         };
         execer =
           [
