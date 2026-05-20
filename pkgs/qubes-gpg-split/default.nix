@@ -9,7 +9,7 @@
 }:
 resholve.mkDerivation rec {
   pname = "qubes-gpg-split";
-  #version = "2.0.84";
+  version = "2.0.84";
 
   src = fetchFromGitHub {
     owner = "QubesOS";
