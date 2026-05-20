@@ -17,7 +17,7 @@
 }:
 resholve.mkDerivation rec {
   pname = "qubes-usb-proxy";
-  inherit version;
+  #inherit version;
 
   src = fetchFromGitHub {
     owner = "QubesOS";

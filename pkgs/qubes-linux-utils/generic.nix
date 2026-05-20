@@ -20,7 +20,7 @@
 }: let
   name = "qubes-linux-utils";
   resholved = resholve.mkDerivation rec {
-    inherit version;
+    #inherit version;
     pname = "${name}-resholved";
 
     src = fetchFromGitHub {

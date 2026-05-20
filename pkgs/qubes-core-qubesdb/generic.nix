@@ -18,7 +18,7 @@
 in
   stdenv.mkDerivation rec {
     pname = "qubes-core-qubesdb";
-    inherit version;
+    #inherit version;
 
     src = fetchFromGitHub {
       owner = "QubesOS";
