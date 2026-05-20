@@ -237,6 +237,11 @@ in
         # first instance is an absolute path check, we could also just hardcode this to true
         substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/bin/zenity" "${zenity}/bin/zenity"
 
+        # make qvm-open-in-dvm call the qrexec-client-vm from qubes-core-qrexec
+        substituteInPlace "$out/bin/qvm-open-in-dvm" \
+          --replace 'exec "$qrexec_client" -- "$target" qubes.OpenURL \\' \
+                    "exec ${qubes-core-qrexec}/bin/qrexec-client-vm -- \"\$target\" qubes.OpenURL \\\\"
+
         # use suid wrapper we will create in the module
         substituteInPlace "$out/etc/qubes-rpc/qubes.Filecopy" --replace "/usr/lib/qubes/qfile-unpacker" "/run/wrappers/bin/qfile-unpacker"
 
