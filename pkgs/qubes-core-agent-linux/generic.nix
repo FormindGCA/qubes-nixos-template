@@ -231,16 +231,11 @@ in
         substituteInPlace "$out/bin/qvm-move-to-vm" --replace "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
         substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/bin/sh -c" "${bash}/bin/sh -c"
         substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/lib/qubes/qopen-in-vm" "$out/lib/qubes/qopen-in-vm"
-        substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/lib/qubes/qrexec-client-vm" "$out/lib/qubes/qrexec-client-vm"
+        #substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/lib/qubes/qrexec-client-vm" "$out/lib/qubes/qrexec-client-vm"
         substituteInPlace "$out/bin/qvm-run-vm" --replace "/usr/lib/qubes/qrun-in-vm" "$out/lib/qubes/qrun-in-vm"
 
         # first instance is an absolute path check, we could also just hardcode this to true
         substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/bin/zenity" "${zenity}/bin/zenity"
-
-        # make qvm-open-in-dvm call the qrexec-client-vm from qubes-core-qrexec
-        substituteInPlace "$out/bin/qvm-open-in-dvm" \
-          --replace 'exec "$qrexec_client" -- "$target" qubes.OpenURL \\' \
-                    "exec ${qubes-core-qrexec}/bin/qrexec-client-vm -- \"\$target\" qubes.OpenURL \\\\"
 
         # use suid wrapper we will create in the module
         substituteInPlace "$out/etc/qubes-rpc/qubes.Filecopy" --replace "/usr/lib/qubes/qfile-unpacker" "/run/wrappers/bin/qfile-unpacker"
