@@ -61,7 +61,7 @@
     "lib/qubes/init/qubes-early-vm-config.sh"
     "lib/qubes/init/qubes-sysinit.sh"
     "lib/qubes/init/misc-post.sh"
-    #"lib/qubes/init/mount-dirs.sh"
+    "lib/qubes/init/mount-dirs.sh"
     "lib/qubes/init/setup-rwdev.sh"
     "lib/qubes/init/bind-dirs.sh"
   ];
