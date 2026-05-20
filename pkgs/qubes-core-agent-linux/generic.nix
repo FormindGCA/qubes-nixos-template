@@ -185,14 +185,28 @@ in
       ''
         # Patch shebangs
         #patchShebangs "$out/etc/qubes-rpc"
-        find $out/etc/qubes-rpc -type f -exec \
-        substituteInPlace {} --replace "/bin/sh" "${bash}/bin/sh" \;
-        find $out/etc/qubes-rpc -type f -exec \
-        substituteInPlace {} --replace "/bin/bash" "${bash}/bin/bash" \;
-        find $out/etc/qubes-rpc -type f -exec \
-        substituteInPlace {} --replace "/usr/bin/bash" "${bash}/bin/bash" \;
-        find $out/etc/qubes-rpc -type f -exec \
-        substituteInPlace {} --replace "/usr/bin/python3" "${python3}/bin/python3" \;
+
+        # Patch Python shebangs under etc/qubes-rpc for NixOS
+        for f in "$out"/etc/qubes-rpc/*; do
+          if head -n1 "$f" | grep -q '#!/usr/bin/python3'; then
+            substituteInPlace "$f" \
+              --replace '#!/usr/bin/python3' "#!${python3}/bin/python3"
+          elif head -n1 "$f" | grep -q '#!/bin/sh'; then
+            substituteInPlace "$f" \
+              --replace '#!/bin/sh' "#!${bash}/bin/sh"
+          elif head -n1 "$f" | grep -E '#!(/usr)?/bin/bash'; then
+            substituteInPlace "$f" \
+              --replace '#!/bin/bash' "#!${bash}/bin/bash" \
+              --replace '#!/usr/bin/bash' "#!${bash}/bin/bash"
+          fi
+        done
+
+        #find $out/etc/qubes-rpc -type f -exec \
+        #substituteInPlace {} --replace "/bin/sh" "${bash}/bin/sh" \;
+        #find $out/etc/qubes-rpc -type f -exec \
+        #substituteInPlace {} --replace "/bin/bash" "${bash}/bin/bash" \;
+        #find $out/etc/qubes-rpc -type f -exec \
+        #substituteInPlace {} --replace "/usr/bin/bash" "${bash}/bin/bash" \;
 
         # install -D -m 0644 -- "boot/grub.qubes" "$out/etc/default/grub.qubes"
         make install-corevm \
