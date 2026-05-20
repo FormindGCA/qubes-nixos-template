@@ -78,8 +78,8 @@
       "lib/qubes/init/resize-rootfs-if-needed.sh"
       "lib/qubes/resize-rootfs"
       "lib/qubes/update-proxy-configs"
-      "bin/qvm-open-in-dvm"
-      "bin/qvm-run-vm"
+      #"bin/qvm-open-in-dvm"
+      #"bin/qvm-run-vm"
     ];
 in
   resholve.mkDerivation rec {
@@ -189,24 +189,18 @@ in
         # Patch Python shebangs under etc/qubes-rpc for NixOS
         for f in "$out"/etc/qubes-rpc/*; do
           if head -n1 "$f" | grep -q '#!/usr/bin/python3'; then
+            echo "Patching shebang in $f"
             substituteInPlace "$f" \
               --replace '#!/usr/bin/python3' "#!${python3}/bin/python3"
-          elif head -n1 "$f" | grep -q '#!/bin/sh'; then
-            substituteInPlace "$f" \
-              --replace '#!/bin/sh' "#!${bash}/bin/sh"
+            head -n1 "$f"
           elif head -n1 "$f" | grep -E '#!(/usr)?/bin/bash'; then
+            echo "Patching shebang in $f"
             substituteInPlace "$f" \
               --replace '#!/bin/bash' "#!${bash}/bin/bash" \
               --replace '#!/usr/bin/bash' "#!${bash}/bin/bash"
+            head -n1 "$f"
           fi
         done
-
-        #find $out/etc/qubes-rpc -type f -exec \
-        #substituteInPlace {} --replace "/bin/sh" "${bash}/bin/sh" \;
-        #find $out/etc/qubes-rpc -type f -exec \
-        #substituteInPlace {} --replace "/bin/bash" "${bash}/bin/bash" \;
-        #find $out/etc/qubes-rpc -type f -exec \
-        #substituteInPlace {} --replace "/usr/bin/bash" "${bash}/bin/bash" \;
 
         # install -D -m 0644 -- "boot/grub.qubes" "$out/etc/default/grub.qubes"
         make install-corevm \
@@ -254,10 +248,15 @@ in
         substituteInPlace "$out/bin/qvm-copy-to-vm" --replace "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
         substituteInPlace "$out/bin/qvm-move" --replace "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
         substituteInPlace "$out/bin/qvm-move-to-vm" --replace "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
+        
+        # patching qvm-open-in-dvm
         substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/bin/sh -c" "${bash}/bin/sh -c"
         substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/lib/qubes/qopen-in-vm" "$out/lib/qubes/qopen-in-vm"
-        #substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/lib/qubes/qrexec-client-vm" "$out/lib/qubes/qrexec-client-vm"
+        substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/lib/qubes/qrexec-client-vm" "${qubes-core-qrexec}/lib/qubes/qrexec-client-vm"
+        
+        # patching qvm-run-vm
         substituteInPlace "$out/bin/qvm-run-vm" --replace "/usr/lib/qubes/qrun-in-vm" "$out/lib/qubes/qrun-in-vm"
+        substituteInPlace "$out/bin/qvm-run-vm" --replace "/usr/lib/qubes/qrexec-client-vm" "${qubes-core-qrexec}/lib/qubes/qrexec-client-vm"
 
         # first instance is an absolute path check, we could also just hardcode this to true
         substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/bin/zenity" "${zenity}/bin/zenity"

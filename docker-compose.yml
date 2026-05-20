@@ -1,0 +1,13 @@
+services:
+  nix:
+    build: .
+    working_dir: /workspace
+    volumes:
+      - qubes-nix-store:/nix
+      - qubes-nix-cache:/root/.cache/nix
+    tty: true
+    stdin_open: true
+
+volumes:
+  qubes-nix-store: {}
+  qubes-nix-cache: {}

@@ -1,0 +1,6 @@
+.git
+result
+*.drv
+*.drv.lock
+*.lock
+tmp
