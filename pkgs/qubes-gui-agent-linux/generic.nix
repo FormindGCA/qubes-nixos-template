@@ -45,7 +45,10 @@ resholve.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "QubesOS";
     repo = pname;
-      rev = if rev != null then rev else "v${version}";
+    rev = if rev != null then rev else "v${version}";
+    inherit hash;
+  };
+
   nativeBuildInputs =
     [
       autoPatchelfHook
