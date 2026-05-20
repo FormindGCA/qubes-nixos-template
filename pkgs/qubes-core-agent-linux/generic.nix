@@ -85,7 +85,7 @@
     ];
 in
   resholve.mkDerivation rec {
-    #inherit version;
+    inherit version;
     pname = "qubes-core-agent-linux";
 
     #PKG_CONFIG_SYSTEMD_SYSTEMDSYSTEMUNITDIR = "${placeholder "out"}/lib/systemd/system";

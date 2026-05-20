@@ -40,7 +40,7 @@
 }:
 resholve.mkDerivation rec {
   pname = "qubes-gui-agent-linux";
-  #inherit version;
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "QubesOS";

@@ -8,7 +8,7 @@
 }:
 stdenv.mkDerivation rec {
   pname = "qubes-gui-common";
-  #inherit version;
+  inherit version;
 
   src = fetchFromGitHub {
     owner = "QubesOS";
