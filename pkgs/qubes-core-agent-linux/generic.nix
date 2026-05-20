@@ -271,6 +271,9 @@ in
 
         rm -rf "$out/usr/bin"
         rm -rf "$out/var/run"
+
+        # Patch shebangs
+        patchShebangs "$out/etc/qubes-rpc"
       ''
       + lib.optionalString (!enableNetworking) ''
         # mock update-proxy-configs with an empty script
