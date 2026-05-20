@@ -57,6 +57,7 @@
   hash,
   rev ? null,
 }: let
+
   scripts_using_functions = [
     "lib/qubes/init/qubes-early-vm-config.sh"
     "lib/qubes/init/qubes-sysinit.sh"
@@ -65,6 +66,7 @@
     "lib/qubes/init/setup-rwdev.sh"
     "lib/qubes/init/bind-dirs.sh"
   ];
+
   scripts =
     scripts_using_functions
     ++ [
@@ -346,9 +348,6 @@ in
             # guarded by check for
             ++ ["kdialog"]
             ++ lib.optional (!enableNetworking) "ip";
-          source = [
-            "lib/qubes/init/mount-dirs.sh"
-          ];
         };
         fix = {
           "/bin/bash" = true;
