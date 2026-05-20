@@ -184,7 +184,15 @@ in
     installPhase =
       ''
         # Patch shebangs
-        patchShebangs "$out/etc/qubes-rpc"
+        #patchShebangs "$out/etc/qubes-rpc"
+        find $out/etc/qubes-rpc -type f -exec \
+        substituteInPlace {} --replace "/bin/sh" "${bash}/bin/sh" \;
+        find $out/etc/qubes-rpc -type f -exec \
+        substituteInPlace {} --replace "/bin/bash" "${bash}/bin/bash" \;
+        find $out/etc/qubes-rpc -type f -exec \
+        substituteInPlace {} --replace "/usr/bin/bash" "${bash}/bin/bash" \;
+        find $out/etc/qubes-rpc -type f -exec \
+        substituteInPlace {} --replace "/usr/bin/python3" "${python3}/bin/python3" \;
 
         # install -D -m 0644 -- "boot/grub.qubes" "$out/etc/default/grub.qubes"
         make install-corevm \
