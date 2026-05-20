@@ -229,7 +229,7 @@ in
         substituteInPlace "$out/bin/qvm-move-to-vm" --replace "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
         substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/bin/sh -c" "${bash}/bin/sh -c"
         substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/lib/qubes/qopen-in-vm" "$out/lib/qubes/qopen-in-vm"
-        substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/lib/qubes/qrexec-client-vm" "${qubes-core-qrexec}/lib/qubes/qrexec-client-vm"
+        substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/lib/qubes/qrexec-client-vm" "qrexec-client-vm"
         substituteInPlace "$out/bin/qvm-run-vm" --replace "/usr/lib/qubes/qrun-in-vm" "$out/lib/qubes/qrun-in-vm"
 
         # first instance is an absolute path check, we could also just hardcode this to true
@@ -358,7 +358,6 @@ in
           "/usr/lib/qubes/init/setup-rw.sh" = true;
           "/usr/lib/qubes/init/setup-rwdev.sh" = true;
           "/usr/lib/qubes/qrexec-client-vm" = true;
-          "${qubes-core-qrexec}/lib/qubes/qrexec-client-vm" = true;
           "/usr/lib/qubes/qubes-fs-tree-check" = true;
           "/usr/lib/qubes/qubes-setup-dnat-to-ns" = true;
           "/usr/lib/qubes/qvm_nautilus_bookmark.sh" = true;
