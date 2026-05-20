@@ -358,6 +358,7 @@ in
           "/usr/lib/qubes/init/setup-rw.sh" = true;
           "/usr/lib/qubes/init/setup-rwdev.sh" = true;
           "/usr/lib/qubes/qrexec-client-vm" = true;
+          "${qubes-core-qrexec}/lib/qubes/qrexec-client-vm" = true;
           "/usr/lib/qubes/qubes-fs-tree-check" = true;
           "/usr/lib/qubes/qubes-setup-dnat-to-ns" = true;
           "/usr/lib/qubes/qvm_nautilus_bookmark.sh" = true;
