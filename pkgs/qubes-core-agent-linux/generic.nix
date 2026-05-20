@@ -183,25 +183,6 @@ in
     # - figure out how to adapt service dropins?
     installPhase =
       ''
-        # Patch shebangs
-        #patchShebangs "$out/etc/qubes-rpc"
-
-        # Patch Python shebangs under etc/qubes-rpc for NixOS
-        for f in "$out"/etc/qubes-rpc/*; do
-          if head -n1 "$f" | grep -q '#!/usr/bin/python3'; then
-            echo "Patching shebang in $f"
-            substituteInPlace "$f" \
-              --replace '#!/usr/bin/python3' "#!${python3}/bin/python3"
-            head -n1 "$f"
-          elif head -n1 "$f" | grep -E '#!(/usr)?/bin/bash'; then
-            echo "Patching shebang in $f"
-            substituteInPlace "$f" \
-              --replace '#!/bin/bash' "#!${bash}/bin/bash" \
-              --replace '#!/usr/bin/bash' "#!${bash}/bin/bash"
-            head -n1 "$f"
-          fi
-        done
-
         # install -D -m 0644 -- "boot/grub.qubes" "$out/etc/default/grub.qubes"
         make install-corevm \
             PYTHON_PREFIX_ARG="--prefix ." \
@@ -263,6 +244,22 @@ in
 
         # use suid wrapper we will create in the module
         substituteInPlace "$out/etc/qubes-rpc/qubes.Filecopy" --replace "/usr/lib/qubes/qfile-unpacker" "/run/wrappers/bin/qfile-unpacker"
+
+        # Patch Python shebangs under etc/qubes-rpc for NixOS
+        for f in `ls $out/etc/qubes-rpc/`; do
+          if head -n1 "$f" | grep -q '#!/usr/bin/python3'; then
+            echo "Patching shebang in $f"
+            substituteInPlace "$f" \
+              --replace '#!/usr/bin/python3' "#!${python3}/bin/python3"
+            head -n1 "$f"
+          elif head -n1 "$f" | grep -E '#!(/usr)?/bin/bash'; then
+            echo "Patching shebang in $f"
+            substituteInPlace "$f" \
+              --replace '#!/bin/bash' "#!${bash}/bin/bash" \
+              --replace '#!/usr/bin/bash' "#!${bash}/bin/bash"
+            head -n1 "$f"
+          fi
+        done
 
         for path in ${lib.concatStringsSep " " scripts_using_functions}; do
           substituteInPlace "$out/$path" --replace '/usr/lib/qubes/init/functions' "functions"
