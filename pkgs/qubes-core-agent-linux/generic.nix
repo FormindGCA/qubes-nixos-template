@@ -2,6 +2,7 @@
   fetchFromGitHub,
   lib,
   resholve,
+  makeWrapper,
   wrapGAppsNoGuiHook,
   stdenv,
   bash,
@@ -104,6 +105,7 @@ in
         pandoc
         pkg-config
         python3
+        makeWrapper
         qubes-core-qubesdb
         qubes-core-vchan-xen
         qubes-linux-utils
@@ -248,13 +250,13 @@ in
         # Patch Python shebangs under etc/qubes-rpc for NixOS
         substituteInPlace "$out/etc/qubes-rpc/qubes.StartApp" --replace '#!/usr/bin/python3' "#!${python3}/bin/python3"
 
-        mv "$out/etc/qubes-rpc/qubes.StartApp" "$out/etc/qubes-rpc/qubes.StartApp.orig"
-        cat > "$out/etc/qubes-rpc/qubes.StartApp" <<EOT
-#!${bash}/bin/sh
-export PYTHONPATH="${qubes-core-qubesdb}/${python3.sitePackages}:$PYTHONPATH"
-exec ${python3}/bin/python3 "$out/etc/qubes-rpc/qubes.StartApp.orig" "\$@"
-EOT
-        chmod +x "$out/etc/qubes-rpc/qubes.StartApp"
+        #mv "$out/etc/qubes-rpc/qubes.StartApp" "$out/etc/qubes-rpc/qubes.StartApp.orig"
+        #cat > "$out/etc/qubes-rpc/qubes.StartApp" <<EOT
+##!${bash}/bin/sh
+#export PYTHONPATH="${qubes-core-qubesdb}/${python3.sitePackages}:$PYTHONPATH"
+#exec ${python3}/bin/python3 "$out/etc/qubes-rpc/qubes.StartApp.orig" "\$@"
+#EOT
+        #chmod +x "$out/etc/qubes-rpc/qubes.StartApp"
 
         #for f in `ls $out/etc/qubes-rpc/`; do
         #  if head -n1 "$f" | grep -E '#!/usr/bin/python3'; then
@@ -470,6 +472,9 @@ EOT
 
     postFixup = ''
       wrapPythonPrograms
+
+      wrapProgram "$out/etc/qubes-rpc/qubes.StartApp" \
+        --prefix PYTHONPATH : ${qubes-core-qubesdb}/lib/python3.13/site-packages
     '';
 
     meta = with lib; {
