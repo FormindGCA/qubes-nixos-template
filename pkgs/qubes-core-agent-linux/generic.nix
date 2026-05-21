@@ -82,12 +82,6 @@
       #"bin/qvm-open-in-dvm"
       #"bin/qvm-run-vm"
     ];
-in
-  resholve.mkDerivation rec {
-    inherit version;
-    pname = "qubes-core-agent-linux";
-
-    #PKG_CONFIG_SYSTEMD_SYSTEMDSYSTEMUNITDIR = "${placeholder "out"}/lib/systemd/system";
 
     src = fetchFromGitHub {
       owner = "QubesOS";
@@ -95,6 +89,22 @@ in
       rev = if rev != null then rev else "v${version}";
       inherit hash;
     };
+
+    qubesagent = python3Packages.buildPythonPackage {
+      pname = "qubesagent";
+      inherit version src;
+      format = "setuptools"; # default, can be omitted if using setuptools
+
+      # If setup.py is at repo root (it is upstream), we can use src directly.
+      # If not, add `srcSubdir = ".";` or similar as needed.
+    };
+
+in
+  resholve.mkDerivation rec {
+    inherit version src;
+    pname = "qubes-core-agent-linux";
+
+    #PKG_CONFIG_SYSTEMD_SYSTEMDSYSTEMUNITDIR = "${placeholder "out"}/lib/systemd/system";
 
     nativeBuildInputs =
       [
@@ -136,8 +146,8 @@ in
         procps
         python3
         qubes-core-qrexec
-        qubes-core-qubesdb
         qubes-core-vchan-xen
+        qubes-core-qubesdb
         qubes-linux-utils
         socat
         xdg-utils
@@ -274,7 +284,9 @@ in
           substituteInPlace "$out/$path" --replace '/usr/lib/qubes/init/functions' "functions"
         done
 
-        substituteInPlace "$out/lib/qubes/init/bind-dirs.sh" --replace "for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do" "for source_folder in $out/lib/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do"
+        substituteInPlace "$out/lib/qubes/init/bind-dirs.sh" --replace \
+          "for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do" \
+          "for source_folder in $out/lib/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do"
 
         # Install systemd script allowing to automount /lib/modules
         # install -m 644 "archlinux/PKGBUILD.qubes-ensure-lib-modules.service" "$out/usr/lib/systemd/system/qubes-ensure-lib-modules.service"
@@ -460,8 +472,14 @@ in
       };
     };
 
-    # we need the qubesdb python package for qubes.StartApp (import qubesdb)
-    pythonPath = with python3Packages; [dbus-python pygobject3 pyxdg] ++ [qubes-core-qubesdb];
+    pythonPath = with python3Packages; [
+      dbus-python
+      pygobject3
+      pyxdg
+    ] ++ [
+      qubes-core-qubesdb
+      qubesagent
+    ];
 
     dontWrapGApps = true;
 
@@ -473,8 +491,11 @@ in
     postFixup = ''
       wrapPythonPrograms
 
+      # We should wrap qubes.StartApp because it's not a normal python entry point
+      program_PYTHONPATH=$(echo "$pythonPath" | sed 's@\s@/${python3.sitePackages}:@g')
+      program_PYTHONPATH=$program_PYTHONPATH/${python3.sitePackages}
       wrapProgram "$out/etc/qubes-rpc/qubes.StartApp" \
-        --prefix PYTHONPATH : ${qubes-core-qubesdb}/lib/python3.13/site-packages
+        --set PYTHONPATH "$program_PYTHONPATH"
     '';
 
     meta = with lib; {
