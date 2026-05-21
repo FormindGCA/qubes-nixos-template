@@ -246,20 +246,19 @@ in
         substituteInPlace "$out/etc/qubes-rpc/qubes.Filecopy" --replace "/usr/lib/qubes/qfile-unpacker" "/run/wrappers/bin/qfile-unpacker"
 
         # Patch Python shebangs under etc/qubes-rpc for NixOS
-        for f in `ls $out/etc/qubes-rpc/`; do
-          if head -n1 "$f" | grep -q '#!/usr/bin/python3'; then
-            echo "Patching shebang in $f"
-            substituteInPlace "$f" \
-              --replace '#!/usr/bin/python3' "#!${python3}/bin/python3"
-            head -n1 "$f"
-          elif head -n1 "$f" | grep -E '#!(/usr)?/bin/bash'; then
-            echo "Patching shebang in $f"
-            substituteInPlace "$f" \
-              --replace '#!/bin/bash' "#!${bash}/bin/bash" \
-              --replace '#!/usr/bin/bash' "#!${bash}/bin/bash"
-            head -n1 "$f"
-          fi
-        done
+        substituteInPlace "$out/etc/qubes-rpc/qubes.StartApp" --replace '#!/usr/bin/python3' "#!${python3}/bin/python3"
+
+        #for f in `ls $out/etc/qubes-rpc/`; do
+        #  if head -n1 "$f" | grep -E '#!/usr/bin/python3'; then
+        #    substituteInPlace "$f" \
+        #      --replace '#!/usr/bin/python3' "#!${python3}/bin/python3"
+        #  elif head -n1 "$f" | grep -E '#!(/usr)?/bin/bash'; then
+        #    substituteInPlace "$f" \
+        #      --replace '#!/bin/bash' "#!${bash}/bin/bash"
+        #    substituteInPlace "$f" \
+        #      --replace '#!/usr/bin/bash' "#!${bash}/bin/bash"
+        #  fi
+        #done
 
         for path in ${lib.concatStringsSep " " scripts_using_functions}; do
           substituteInPlace "$out/$path" --replace '/usr/lib/qubes/init/functions' "functions"
