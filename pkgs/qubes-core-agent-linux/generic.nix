@@ -450,7 +450,8 @@ in
       };
     };
 
-    pythonPath = with python3Packages; [dbus-python pygobject3 pyxdg];
+    # we need the qubesdb python package for qubes.StartApp (import qubesdb)
+    pythonPath = with python3Packages; [dbus-python pygobject3 pyxdg] ++ [qubes-core-qubesdb];
 
     dontWrapGApps = true;
 
