@@ -32,8 +32,8 @@
   util-linux,
   which,
   xen,
-  xfce,
-  xorg,
+  #xfce,
+  #xorg,
   zenity,
   dbus,
   version,
@@ -73,13 +73,18 @@ resholve.mkDerivation rec {
       qubes-core-vchan-xen
       qubes-core-qubesdb
       xen
+      # xorg
+      libxdamage
+      libxcomposite
+      util-macros
+      xorg-server
     ]
-    ++ (with xorg; [
-      libXdamage
-      libXcomposite
-      utilmacros
-      xorgserver
-    ]);
+    #++ (with xorg; [
+    #  libXdamage
+    #  libXcomposite
+    #  utilmacros
+    #  xorgserver
+    #]);
 
   buildInputs =
     [
@@ -91,17 +96,24 @@ resholve.mkDerivation rec {
       python3Packages.xcffib
       systemd
       dbus
-      xfce.xfconf
+      xfconf
       # xdg-user-dirs-update
-    ]
-    ++ (with xorg; [
-      libXcomposite
-      libXdamage
+      # xorg
+      libxcomposite
+      libxdamage
       xinit
       xrandr
       xprop
       xsetroot
-    ]);
+    ]
+    #++ (with xorg; [
+    #  libXcomposite
+    #  libXdamage
+    #  xinit
+    #  xrandr
+    #  xprop
+    #  xsetroot
+    #]);
 
   postPatch = ''
     rm -f pulse/pulsecore
@@ -136,9 +148,9 @@ resholve.mkDerivation rec {
     # these are nested within runuser calls, easier to just substituteInPlace
     # and pretend to resholve that runuser is not executing it's args
     substituteInPlace "$out/usr/bin/qubes-run-xorg" --replace ' /bin/sh' ' ${bash}/bin/sh'
-    substituteInPlace "$out/usr/bin/qubes-run-xorg" --replace '/usr/bin/xinit' '${xorg.xinit}/bin/xinit'
+    substituteInPlace "$out/usr/bin/qubes-run-xorg" --replace '/usr/bin/xinit' '${xinit}/bin/xinit'
     # skip the wrapper since it's just to determine which binary to call
-    substituteInPlace "$out/usr/bin/qubes-run-xorg" --replace '/usr/lib/qubes/qubes-xorg-wrapper' "${xorg.xorgserver}/bin/Xorg"
+    substituteInPlace "$out/usr/bin/qubes-run-xorg" --replace '/usr/lib/qubes/qubes-xorg-wrapper' "${xorg-server}/bin/Xorg"
 
     # config file template and rendered config relocation
     substituteInPlace "$out/usr/bin/qubes-run-xorg" --replace '/etc/X11/xorg-qubes.conf.template' "$out/etc/X11/xorg-qubes.conf.template"
@@ -159,9 +171,9 @@ resholve.mkDerivation rec {
 
     cat >> $out/etc/X11/xorg-qubes.conf.template <<EOF
     Section "Files"
-      ModulePath "${xorg.xorgserver}/lib/xorg/modules"
-      ModulePath "${xorg.xorgserver}/lib/xorg/modules/extensions"
-      ModulePath "${xorg.xorgserver}/lib/xorg/modules/drivers"
+      ModulePath "${xorg-server}/lib/xorg/modules"
+      ModulePath "${xorg-server}/lib/xorg/modules/extensions"
+      ModulePath "${xorg-server}/lib/xorg/modules/drivers"
       ModulePath "$out/lib/xorg/modules/drivers"
     EndSection
     EOF
@@ -213,11 +225,11 @@ resholve.mkDerivation rec {
         systemd
         util-linux
         which
-        xfce.xfce4-settings
-        xfce.xfconf
-        xorg.xprop
-        xorg.xinit
-        xorg.xsetroot
+        xfce4-settings
+        xfconf
+        xprop
+        xinit
+        xsetroot
       ];
       keep = {
         source = [
@@ -229,8 +241,8 @@ resholve.mkDerivation rec {
       };
       execer = [
         "cannot:${systemd}/bin/systemctl"
-        "cannot:${xfce.xfce4-settings}/bin/xfsettingsd"
-        "cannot:${xfce.xfconf}/bin/xfconf-query"
+        "cannot:${xfce4-settings}/bin/xfsettingsd"
+        "cannot:${xfconf}/bin/xfconf-query"
         # lies
         "cannot:bin/qubes-gui-runuser"
         "cannot:${util-linux}/bin/runuser"
