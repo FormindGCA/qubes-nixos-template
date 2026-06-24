@@ -23,6 +23,7 @@
   iproute2,
   kmod,
   librsvg,
+  libx11,
   lsb-release,
   lvm2,
   mount,
