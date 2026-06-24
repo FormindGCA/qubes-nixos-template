@@ -41,6 +41,7 @@
   xprop,
   xinit,
   xsetroot,
+  xrandr,
   #xorg,
   xorg-server,
   zenity,
