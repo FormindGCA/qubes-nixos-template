@@ -83,7 +83,7 @@ resholve.mkDerivation rec {
       libxcomposite
       util-macros
       xorg-server
-    ]
+    ];
     #++ (with xorg; [
     #  libXdamage
     #  libXcomposite
@@ -110,7 +110,7 @@ resholve.mkDerivation rec {
       xrandr
       xprop
       xsetroot
-    ]
+    ];
     #++ (with xorg; [
     #  libXcomposite
     #  libXdamage
