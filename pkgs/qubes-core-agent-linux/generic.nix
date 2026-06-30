@@ -94,12 +94,12 @@
 
     qubesagent = python3Packages.buildPythonPackage {
       pname = "qubesagent";
-      inherit version src;
+      inherit version;
       format = "setuptools"; # default, can be omitted if using setuptools
 
       # If setup.py is at repo root (it is upstream), we can use src directly.
       # If not, add `srcSubdir = ".";` or similar as needed.
-      srcSubdir = "python";
+      src = "${src}/python";
     };
 
 in
