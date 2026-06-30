@@ -141,6 +141,8 @@ resholve.mkDerivation rec {
     make appvm
   '';
 
+  dontMoveSystemdUserUnits = true;
+
   # FIXME sub xdg autostart paths
   # FIXME nixgl
   installPhase = ''
