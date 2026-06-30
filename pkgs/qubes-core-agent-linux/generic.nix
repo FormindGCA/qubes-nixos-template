@@ -191,9 +191,9 @@ in
       # FIXME use substituteInPlace
       # sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
 
-      for dir in qubes-rpc misc; do
-          make -C "$dir"
-      done
+      #for dir in qubes-rpc misc; do
+      #    make -C "$dir"
+      #done
     '';
 
     # Don't move doc, needed in the subsequent packaging
