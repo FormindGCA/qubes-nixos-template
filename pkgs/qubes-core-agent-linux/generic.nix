@@ -105,7 +105,7 @@
       NIX_CFLAGS_COMPILE = [ "-I${src}/include" ];
 
       preBuild = ''
-        export CFLAGS="${CFLAGS} -I${src}/include"
+        export CFLAGS="${CFLAGS:-} -I${src}/include"
       '';
   };
 
