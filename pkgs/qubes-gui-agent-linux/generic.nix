@@ -12,6 +12,7 @@
   libtool,
   libunistring,
   libXt,
+  libXcursor,
   libxdamage,
   libxcomposite,
   lsb-release,
@@ -77,6 +78,7 @@ resholve.mkDerivation rec {
       pulseaudio
       pipewire
       libXt
+      libXcursor
       pixman
       lsb-release
       qubes-gui-common
@@ -111,6 +113,7 @@ resholve.mkDerivation rec {
       # xorg
       libxcomposite
       libxdamage
+      libXcursor
       xinit
       xrandr
       xprop
