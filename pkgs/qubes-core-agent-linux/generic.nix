@@ -101,11 +101,8 @@
       # If not, add `srcSubdir = ".";` or similar as needed.
       src = "${src}/python";
 
-      # headers are under python/include in your case 
-      NIX_CFLAGS_COMPILE = [ "-I${src}/include" ];
-
       preBuild = ''
-        export CFLAGS="${CFLAGS:-} -I${src}/include"
+        export CFLAGS="-I${src}/python/include"
       '';
   };
 
