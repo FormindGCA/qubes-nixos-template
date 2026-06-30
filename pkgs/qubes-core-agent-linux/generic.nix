@@ -99,6 +99,7 @@
 
       # If setup.py is at repo root (it is upstream), we can use src directly.
       # If not, add `srcSubdir = ".";` or similar as needed.
+      srcSubdir = "python";
     };
 
 in
