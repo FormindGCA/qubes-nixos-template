@@ -102,7 +102,7 @@
       src = "${src}/python";
 
       preBuild = ''
-        export CFLAGS="-I${src}/python/include"
+        export CFLAGS="-I${src}/include"
       '';
   };
 
