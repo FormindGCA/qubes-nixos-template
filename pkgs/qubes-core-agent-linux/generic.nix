@@ -174,10 +174,11 @@ in
       ]);
 
     postPatch = ''
-      substituteInPlace Makefile --replace 'SHELL = /bin/bash' 'SHELL = ${bash}/bin/bash'
+      #substituteInPlace Makefile --replace-fail 'SHELL = /bin/bash' 'SHELL = ${bash}/bin/bash'
 
       # skip installing qfile-unpacker / bin-qfile-unpacker as SUID
-      sed -i 's/-m 4755/-m 755/g' qubes-rpc/Makefile
+      #ls -lah 
+      #sed -i 's/-m 4755/-m 755/g' qubes-rpc/Makefile
     '';
 
     buildPhase = ''
