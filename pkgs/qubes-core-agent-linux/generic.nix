@@ -94,18 +94,18 @@
 
     qubesagent = python3Packages.buildPythonPackage {
       pname = "qubesagent";
-      inherit version;
+      inherit version src;
       format = "setuptools"; # default, can be omitted if using setuptools
 
       # If setup.py is at repo root (it is upstream), we can use src directly.
       # If not, add `srcSubdir = ".";` or similar as needed.
-      src = "${src}/python";
+      #src = "${src}/python";
 
-      preBuild = ''
-        export CFLAGS="-I${src}/include"
-      '';
+      #preBuild = ''
+      #  export CFLAGS="-I${src}/include"
+      #'';
 
-      buildInputs = [ qubes-core-qubesdb qubes-core-vchan-xen ];
+      #buildInputs = [ qubes-core-qubesdb qubes-core-vchan-xen ];
   };
 
 in
@@ -174,11 +174,11 @@ in
       ]);
 
     postPatch = ''
-      #substituteInPlace Makefile --replace-fail 'SHELL = /bin/bash' 'SHELL = ${bash}/bin/bash'
+      substituteInPlace Makefile --replace-fail 'SHELL = /bin/bash' 'SHELL = ${bash}/bin/bash'
 
       # skip installing qfile-unpacker / bin-qfile-unpacker as SUID
-      #ls -lah 
-      #sed -i 's/-m 4755/-m 755/g' qubes-rpc/Makefile
+      ls -lah 
+      sed -i 's/-m 4755/-m 755/g' qubes-rpc/Makefile
     '';
 
     buildPhase = ''
@@ -191,9 +191,9 @@ in
       # FIXME use substituteInPlace
       # sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
 
-      #for dir in qubes-rpc misc; do
-      #    make -C "$dir"
-      #done
+      for dir in qubes-rpc misc; do
+          make -C "$dir"
+      done
     '';
 
     # Don't move doc, needed in the subsequent packaging
