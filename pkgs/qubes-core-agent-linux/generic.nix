@@ -103,7 +103,10 @@
 
       # headers are under python/include in your case 
       NIX_CFLAGS_COMPILE = [ "-I${src}/include" ];
-      preBuild = ''    export CFLAGS="${CFLAGS} -I${src}/include"  '';
+
+      preBuild = ''
+        export CFLAGS="${CFLAGS} -I${src}/include"
+      '';
   };
 
 in
