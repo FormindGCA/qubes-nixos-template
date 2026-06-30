@@ -104,6 +104,8 @@
       preBuild = ''
         export CFLAGS="-I${src}/include"
       '';
+
+      buildInputs = [ qubes-core-qubesdb qubes-core-vchan-xen ];
   };
 
 in
