@@ -100,7 +100,11 @@
       # If setup.py is at repo root (it is upstream), we can use src directly.
       # If not, add `srcSubdir = ".";` or similar as needed.
       src = "${src}/python";
-    };
+
+      # headers are under python/include in your case 
+      NIX_CFLAGS_COMPILE = [ "-I${src}/include" ];
+      preBuild = ''    export CFLAGS="${CFLAGS} -I${src}/include"  '';
+  };
 
 in
   resholve.mkDerivation rec {
