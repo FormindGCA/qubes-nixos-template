@@ -467,6 +467,7 @@ in
       # reliably discover every import path they need.
       wrapProgram "$out/etc/qubes-rpc/qubes.StartApp" \
         --set PYTHONPATH "$program_PYTHONPATH" \
+        --prefix PATH : "/run/wrappers/bin:/home/user/.nix-profile/bin:/nix/profile/bin:/home/user/.local/state/nix/profile/bin:/etc/profiles/per-user/user/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin" \
         --prefix XDG_DATA_DIRS : "/run/current-system/sw/share:/etc/profiles/per-user/user/share:/home/user/.nix-profile/share"
       wrapProgram "$out/bin/qubes-vmexec" \
         --set PYTHONPATH "$program_PYTHONPATH"
