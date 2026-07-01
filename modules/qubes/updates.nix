@@ -132,6 +132,15 @@ with lib; {
             #!${pkgs.stdenv.shell}
 
             export PATH=${lib.makeBinPath (with pkgs; [bash coreutils fakeroot gawk gnugrep gnused gnutar python3 systemd upgradesStatusNotify getPackages nixosRebuildWrapper])}:/run/current-system/sw/bin:$PATH
+
+            case "$1" in
+              -2Fusr-2Fbin-2Fpython3+-2Frun-2Fqubes--update-2Fagent-2Fentrypoint.py*)
+                qubes-nixos-rebuild
+                upgrades-status-notify
+                exit 0
+                ;;
+            esac
+
             exec ${config.services.qubes.core.package.out}/bin/qubes-vmexec "$@"
           '';
           executable = true;
