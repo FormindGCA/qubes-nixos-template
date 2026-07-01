@@ -461,16 +461,19 @@ in
     postFixup = ''
       wrapPythonPrograms
 
-      program_PYTHONPATH="$out/${python3.sitePackages}:${programPythonPath}"
+      program_PYTHONPATH="$out/${python3.sitePackages}:${programPythonPath}:${qubes-core-qubesdb}/${python3.sitePackages}"
+      program_LIBRARY_PATH="${qubes-core-qubesdb}/lib:${qubes-core-vchan-xen}/lib"
 
       # These are not normal Python entry points, so wrapPythonPrograms does not
       # reliably discover every import path they need.
       wrapProgram "$out/etc/qubes-rpc/qubes.StartApp" \
         --set PYTHONPATH "$program_PYTHONPATH" \
+        --prefix LD_LIBRARY_PATH : "$program_LIBRARY_PATH" \
         --prefix PATH : "/run/wrappers/bin:/home/user/.nix-profile/bin:/nix/profile/bin:/home/user/.local/state/nix/profile/bin:/etc/profiles/per-user/user/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin" \
         --prefix XDG_DATA_DIRS : "/run/current-system/sw/share:/etc/profiles/per-user/user/share:/home/user/.nix-profile/share"
       wrapProgram "$out/bin/qubes-vmexec" \
-        --set PYTHONPATH "$program_PYTHONPATH"
+        --set PYTHONPATH "$program_PYTHONPATH" \
+        --prefix LD_LIBRARY_PATH : "$program_LIBRARY_PATH"
     '';
 
     meta = with lib; {
