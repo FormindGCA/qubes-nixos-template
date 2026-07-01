@@ -91,12 +91,6 @@ resholve.mkDerivation rec {
       util-macros
       xorg-server
     ];
-    #++ (with xorg; [
-    #  libXdamage
-    #  libXcomposite
-    #  utilmacros
-    #  xorgserver
-    #]);
 
   buildInputs =
     [
@@ -119,14 +113,6 @@ resholve.mkDerivation rec {
       xprop
       xsetroot
     ];
-    #++ (with xorg; [
-    #  libXcomposite
-    #  libXdamage
-    #  xinit
-    #  xrandr
-    #  xprop
-    #  xsetroot
-    #]);
 
   postPatch = ''
     rm -f pulse/pulsecore
@@ -160,31 +146,29 @@ resholve.mkDerivation rec {
     # issue since our wrapper only refers to external resources
     substituteInPlace "$out/etc/xdg/autostart/qubes-qrexec-fork-server.desktop" --replace '/usr/bin/qrexec-fork-server' "$out/bin/qrexec-fork-server"
 
+    qubesRunXorg="$out/usr/bin/qubes-run-xorg"
+    qubesSession="$out/usr/bin/qubes-session"
+    xorgConfigTemplate="$out/etc/X11/xorg-qubes.conf.template"
+
     # these are nested within runuser calls, easier to just substituteInPlace
-    # and pretend to resholve that runuser is not executing it's args
-    substituteInPlace "$out/usr/bin/qubes-run-xorg" --replace ' /bin/sh' ' ${bash}/bin/sh'
-    substituteInPlace "$out/usr/bin/qubes-run-xorg" --replace '/usr/bin/xinit' '${xinit}/bin/xinit'
+    # and pretend to resholve that runuser is not executing its args
+    substituteInPlace "$qubesRunXorg" --replace ' /bin/sh' ' ${bash}/bin/sh'
+    substituteInPlace "$qubesRunXorg" --replace '/usr/bin/xinit' '${xinit}/bin/xinit'
     # skip the wrapper since it's just to determine which binary to call
-    substituteInPlace "$out/usr/bin/qubes-run-xorg" --replace '/usr/lib/qubes/qubes-xorg-wrapper' "${xorg-server}/bin/Xorg"
+    substituteInPlace "$qubesRunXorg" --replace '/usr/lib/qubes/qubes-xorg-wrapper' "${xorg-server}/bin/Xorg"
 
     # config file template and rendered config relocation
-    substituteInPlace "$out/usr/bin/qubes-run-xorg" --replace '/etc/X11/xorg-qubes.conf.template' "$out/etc/X11/xorg-qubes.conf.template"
-    substituteInPlace "$out/usr/bin/qubes-run-xorg" --replace ' /etc/X11/xorg-qubes.conf' ' /var/run/xorg-qubes.conf'
-    substituteInPlace "$out/usr/bin/qubes-run-xorg" --replace '-config xorg-qubes.conf' '-config /var/run/xorg-qubes.conf'
-
-    # resholve won't replace the absolute path reference in this conditional,
-    # we can just substitute with true
-    # FIXME this wasn't actually replaced properly before...
-    # substituteInPlace "$out/usr/bin/qubes-run-xorg" --replace 'if [ -x /bin/loginctl ]; then' 'if [ true ]; then'
+    substituteInPlace "$qubesRunXorg" --replace '/etc/X11/xorg-qubes.conf.template' "$xorgConfigTemplate"
+    substituteInPlace "$qubesRunXorg" --replace ' /etc/X11/xorg-qubes.conf' ' /var/run/xorg-qubes.conf'
+    substituteInPlace "$qubesRunXorg" --replace '-config xorg-qubes.conf' '-config /var/run/xorg-qubes.conf'
 
     # replace xdg autostart since we generate systemd units instead
-    # FIXME probably needs to be moved earlier in process
-    substituteInPlace "$out/usr/bin/qubes-session" --replace '/usr/bin/qubes-session-autostart QUBES X-QUBES "X-$VMTYPE" "X-$UPDTYPE"' 'systemctl --user set-environment XDG_CURRENT_DESKTOP="QUBES:X-QUBES:X-$VMTYPE:X-$UPDTYPE"'
+    substituteInPlace "$qubesSession" --replace '/usr/bin/qubes-session-autostart QUBES X-QUBES "X-$VMTYPE" "X-$UPDTYPE"' 'systemctl --user set-environment XDG_CURRENT_DESKTOP="QUBES:X-QUBES:X-$VMTYPE:X-$UPDTYPE"'
 
     # NOTE glx is pulled in by default but there seems to be some weird race when attempting to load glamoregl before glx
-    sed -i -e 's/Section "Module"/Section "Module"\n        Load "glx"/' "$out/etc/X11/xorg-qubes.conf.template"
+    sed -i -e 's/Section "Module"/Section "Module"\n        Load "glx"/' "$xorgConfigTemplate"
 
-    cat >> $out/etc/X11/xorg-qubes.conf.template <<EOF
+    cat >> "$xorgConfigTemplate" <<EOF
     Section "Files"
       ModulePath "${xorg-server}/lib/xorg/modules"
       ModulePath "${xorg-server}/lib/xorg/modules/extensions"
