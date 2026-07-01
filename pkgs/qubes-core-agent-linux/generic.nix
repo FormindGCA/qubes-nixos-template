@@ -466,7 +466,8 @@ in
       # These are not normal Python entry points, so wrapPythonPrograms does not
       # reliably discover every import path they need.
       wrapProgram "$out/etc/qubes-rpc/qubes.StartApp" \
-        --set PYTHONPATH "$program_PYTHONPATH"
+        --set PYTHONPATH "$program_PYTHONPATH" \
+        --prefix XDG_DATA_DIRS : "/run/current-system/sw/share:/etc/profiles/per-user/user/share:/home/user/.nix-profile/share"
       wrapProgram "$out/bin/qubes-vmexec" \
         --set PYTHONPATH "$program_PYTHONPATH"
     '';
