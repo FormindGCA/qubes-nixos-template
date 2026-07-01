@@ -1,5 +1,7 @@
 # nix expressions for creating a qubes templatevm
 
+This repository currently targets Qubes OS 4.3 template VMs.
+
 ## getting started
 
 *warning*: proceed at your own risk, this involves copying files to dom0 and installing a template
@@ -24,6 +26,31 @@ qvm-run nixos xterm
 ```
 
 at this point you can customize the template and use it like any other NixOS install. the example config has been copied to `/etc/nixos`.
+
+## local development with docker
+
+The included compose setup runs Nix in a container and keeps the Nix store in a Docker volume.
+
+Rebuild the image after changing files, because the Dockerfile copies the repository into `/workspace`:
+
+```sh
+docker compose build
+```
+
+Build a focused package while iterating:
+
+```sh
+docker compose run --rm nix nix --extra-experimental-features "nix-command flakes" build --no-link --impure .#qubes-gui-agent-linux
+docker compose run --rm nix nix --extra-experimental-features "nix-command flakes" build --no-link --impure .#qubes-core-agent-linux
+```
+
+Build the full example system closure:
+
+```sh
+docker compose run --rm nix nix --extra-experimental-features "nix-command flakes" build --no-link --impure .#nixosConfigurations.nixos.config.system.build.toplevel
+```
+
+Network timeouts while fetching Qubes or nixpkgs sources can fail an otherwise valid build. Retrying the same command is usually enough once the source has been fetched into the Docker volume.
 
 ## alternative install via iso
 
@@ -100,4 +127,4 @@ Host github.com
 
 ### todo
 - deal with substituteInPlace deprecation
-- support both qubes 4.2 and 4.3 package sets
+- clean up package fixups and resholve configuration
