@@ -12,7 +12,7 @@ Stabilize the Qubes/NixOS integration before doing larger cleanups. Prefer small
 - Generic qrexec RPC services should come from the base `qubes-core-agent-linux` package.
 - Networking services may use a networking-enabled `qubes-core-agent-linux` package, but enabling networking must not silently change generic RPC behavior.
 - `qubes.StartApp` and `qubes.VMExec` must run with a Python environment that can import `qubesagent` and `qubesdb`.
-- `qubes.VMExec` must execute updater-injected Python scripts with the Nix Python, because they use `/usr/bin/python3` shebangs.
+- `qubes.VMExec` must execute updater-injected Python commands with the Nix Python, because dom0 calls `/usr/bin/python3` and injected scripts use `/usr/bin/python3` shebangs.
 - The generated system must expose qrexec services through `/etc/qubes-rpc` for Qubes compatibility.
 - `/usr/share` must resolve to the NixOS system profile because Qubes tools use hard-coded `/usr/share` paths.
 - `/usr/lib/qubes/upgrades-status-notify` must resolve because the upstream VM update agent calls it directly.
