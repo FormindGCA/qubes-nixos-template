@@ -52,6 +52,16 @@ docker compose run --rm nix nix --extra-experimental-features "nix-command flake
 
 Network timeouts while fetching Qubes or nixpkgs sources can fail an otherwise valid build. Retrying the same command is usually enough once the source has been fetched into the Docker volume.
 
+## qrexec / RPC notes
+
+Qubes expects RPC services under `/etc/qubes-rpc`, so the NixOS module generates that directory from the configured qrexec service packages. The qrexec service path also keeps `/etc/qubes-rpc` first for compatibility.
+
+Generic RPC services such as `qubes.StartApp` come from `services.qubes.core.basePackage`. Networking scripts such as `setup-ip` come from `services.qubes.core.networkingPackage`, so enabling networking does not change the package that provides generic RPCs.
+
+Some upstream Qubes tools still use hard-coded `/usr/share` paths. The core module creates `/usr/share -> /run/current-system/sw/share` so those tools can find desktop files and Qubes XDG override data on NixOS.
+
+The Python RPC entry points are wrapped with explicit `PYTHONPATH` and library paths. In particular, `qubes.StartApp` and `qubes.VMExec` need to import `qubesagent` and `qubesdb` outside a normal Python package entry point.
+
 ## alternative install via iso
 
 for those that want to avoid installing anything in dom0, these instructions will allow you to install to

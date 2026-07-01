@@ -11,7 +11,6 @@ with lib; {
 
   config = mkIf config.services.qubes.networking.enable {
     services.qubes.core.enable = true;
-    services.qubes.core.networking = true;
 
     services.resolved.enable = true;
 
@@ -19,7 +18,7 @@ with lib; {
       # ensure the service is started on boot, since Install is ignored
       wantedBy = ["multi-user.target"];
       serviceConfig = {
-        ExecStart = ["" "${config.services.qubes.core.package}/lib/qubes/init/network-uplink-wait.sh"];
+        ExecStart = ["" "${config.services.qubes.core.networkingPackage}/lib/qubes/init/network-uplink-wait.sh"];
       };
     };
 
@@ -29,8 +28,8 @@ with lib; {
       requires = ["network-pre.target" "qubes-db.service"];
 
       serviceConfig = {
-        ExecStart = ["" "${config.services.qubes.core.package}/lib/qubes/setup-ip add \"%i\""];
-        ExecStop = ["" "${config.services.qubes.core.package}/lib/qubes/setup-ip remove \"%i\""];
+        ExecStart = ["" "${config.services.qubes.core.networkingPackage}/lib/qubes/setup-ip add \"%i\""];
+        ExecStop = ["" "${config.services.qubes.core.networkingPackage}/lib/qubes/setup-ip remove \"%i\""];
       };
     };
 

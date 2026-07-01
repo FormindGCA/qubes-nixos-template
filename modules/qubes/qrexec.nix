@@ -8,7 +8,7 @@
   qrexec_services =
     [
       "${cfg.package}/etc/qubes-rpc"
-      "${pkgs.qubes-core-agent-linux}/etc/qubes-rpc"
+      "${config.services.qubes.core.basePackage}/etc/qubes-rpc"
     ]
     ++ map (x: "${x}/etc/qubes-rpc") cfg.packages;
   qrexecServiceDirectory = pkgs.symlinkJoin {

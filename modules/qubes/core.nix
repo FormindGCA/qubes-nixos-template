@@ -9,7 +9,6 @@ in
   with lib; {
     options.services.qubes.core = {
       enable = mkEnableOption "the core qubes services";
-      networking = mkEnableOption "include core qubes networking services";
       user = {
         name = mkOption {
           type = types.str;
@@ -39,18 +38,27 @@ in
       };
       package = mkOption {
         type = types.package;
-        description = "qubes-core-agent-linux package as configured by the qubes module options";
+        description = "qubes-core-agent-linux package used by core services.";
         internal = true;
         defaultText = literalExpression "pkgs.qubes-core-agent-linux";
         default = pkgs.qubes-core-agent-linux;
       };
+      basePackage = mkOption {
+        type = types.package;
+        description = "Base qubes-core-agent-linux package used for generic core services and qrexec RPCs.";
+        defaultText = literalExpression "pkgs.qubes-core-agent-linux";
+        default = pkgs.qubes-core-agent-linux;
+      };
+      networkingPackage = mkOption {
+        type = types.package;
+        description = "Networking-enabled qubes-core-agent-linux package used only by Qubes networking services.";
+        defaultText = literalExpression ''pkgs.qubes-core-agent-linux.override { enableNetworking = true; }'';
+        default = pkgs.qubes-core-agent-linux.override {enableNetworking = true;};
+      };
     };
     config = mkIf cfg.enable (
       let
-        qubes-core-agent-linux =
-          if cfg.networking
-          then (pkgs.qubes-core-agent-linux.override {enableNetworking = true;})
-          else (cfg.package.default);
+        qubes-core-agent-linux = cfg.basePackage;
         userHome =
           if cfg.user.home != null
           then cfg.user.home

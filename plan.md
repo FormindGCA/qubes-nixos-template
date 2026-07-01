@@ -11,18 +11,15 @@ Stabilize the Qubes/NixOS integration before doing larger cleanups. Prefer small
 - `qubes.StartApp` must remain resolvable through `QREXEC_SERVICE_PATH`.
 - Generic qrexec RPC services should come from the base `qubes-core-agent-linux` package.
 - Networking services may use a networking-enabled `qubes-core-agent-linux` package, but enabling networking must not silently change generic RPC behavior.
-- `qubes.VMExec` must run with a Python environment that can import `qubesagent`.
+- `qubes.StartApp` and `qubes.VMExec` must run with a Python environment that can import `qubesagent` and `qubesdb`.
+- The generated system must expose qrexec services through `/etc/qubes-rpc` for Qubes compatibility.
+- `/usr/share` must resolve to the NixOS system profile because Qubes tools use hard-coded `/usr/share` paths.
 - Every refactor should be validated with a full system build and at least one targeted evaluation of the affected paths.
 
 ## Next Milestone: Split Core Agent Package Roles
 
-1. Add explicit package options under `services.qubes.core`:
-   - `basePackage = pkgs.qubes-core-agent-linux`
-   - `networkingPackage = pkgs.qubes-core-agent-linux.override { enableNetworking = true; }`
-2. Keep `services.qubes.core.package` temporarily for compatibility or internal use.
-3. Make qrexec use `config.services.qubes.core.basePackage` for generic RPC services.
-4. Make networking use `config.services.qubes.core.networkingPackage` for networking scripts and services.
-5. Stop making `services.qubes.core.networking` replace the package used by all core services.
+1. Re-test Qubes Updater / `qubes.VMExec` in a real template VM.
+2. Re-test networking in an AppVM based on the template.
 
 ## Validation For Package Role Refactor
 
@@ -63,3 +60,9 @@ Also verify:
 - Made Qubes update configuration directory and flake configuration configurable.
 - Wrapped `qubes-vmexec` with a Python path containing `qubesagent`.
 - Reverted the qrexec RPC path behavior that broke `qubes.StartApp` resolution.
+- Exposed generated qrexec RPC services under `/etc/qubes-rpc`.
+- Added `/usr/share -> /run/current-system/sw/share` compatibility for Qubes hard-coded paths.
+- Wrapped `qubes.StartApp` and `qubes-vmexec` with Python/library paths for `qubesagent` and `qubesdb`.
+- Added `services.qubes.core.basePackage` and `services.qubes.core.networkingPackage`.
+- Removed the unused `services.qubes.core.networking` package-switch option.
+- Documented the qrexec, `/etc/qubes-rpc`, `/usr/share`, and Python wrapper invariants in the README.
