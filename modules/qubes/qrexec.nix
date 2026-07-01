@@ -4,11 +4,23 @@
   pkgs,
   ...
 }: let
-  qrexec_services = ["${pkgs.qubes-core-qrexec}/etc/qubes-rpc" "${pkgs.qubes-core-agent-linux}/etc/qubes-rpc"] ++ map (x: "${x}/etc/qubes-rpc") config.services.qubes.qrexec.packages;
+  cfg = config.services.qubes.qrexec;
+  qrexec_services =
+    [
+      "${cfg.package}/etc/qubes-rpc"
+      "${pkgs.qubes-core-agent-linux}/etc/qubes-rpc"
+    ]
+    ++ map (x: "${x}/etc/qubes-rpc") cfg.packages;
 in
   with lib; {
     options.services.qubes.qrexec = {
       enable = mkEnableOption "the qubes remote exec agent daemon";
+      package = mkOption {
+        type = types.package;
+        default = pkgs.qubes-core-qrexec;
+        defaultText = literalExpression "pkgs.qubes-core-qrexec";
+        description = "Qubes qrexec package used by the VM agent service.";
+      };
       packages = mkOption {
         type = types.listOf types.path;
         default = [];
@@ -29,7 +41,7 @@ in
 
       # adding to system packages will cause their xdg autostart files to be picked up
       environment.systemPackages = [
-        pkgs.qubes-core-qrexec
+        cfg.package
       ];
 
       security.polkit.enable = true;
@@ -45,13 +57,13 @@ in
         after = ["systemd-modules-load.service" "xendriverdomain.service" "systemd-user-sessions.service"];
         environment = {
           QREXEC_SERVICE_PATH = concatStringsSep ":" qrexec_services;
-          QREXEC_MULTIPLEXER_PATH = "${pkgs.qubes-core-qrexec}/lib/qubes/qubes-rpc-multiplexer";
+          QREXEC_MULTIPLEXER_PATH = "${cfg.package}/lib/qubes/qubes-rpc-multiplexer";
         };
 
         serviceConfig = {
           Type = "notify";
           ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p /var/log/qubes";
-          ExecStart = "${pkgs.qubes-core-qrexec}/lib/qubes/qrexec-agent";
+          ExecStart = "${cfg.package}/lib/qubes/qrexec-agent";
           KillMode = "process";
           SELinuxContext = "system_u:system_r:local_login_t:s0-s0:c0.c1023";
         };
