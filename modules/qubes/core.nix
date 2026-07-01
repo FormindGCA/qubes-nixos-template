@@ -131,6 +131,10 @@ in
         systemd.tmpfiles.rules = [
           # create mount point
           "d /rw 0755 root root"
+          # Qubes tools use /usr/share in a few places, including StartApp's
+          # app-dispvm override path.
+          "d /usr 0755 root root"
+          "L+ /usr/share - - - - /run/current-system/sw/share"
           # create mount point
           "d /usr/local 0755 root root"
           # mkdir so that first-boot-completed can be created here

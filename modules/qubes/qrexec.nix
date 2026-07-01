@@ -11,6 +11,10 @@
       "${pkgs.qubes-core-agent-linux}/etc/qubes-rpc"
     ]
     ++ map (x: "${x}/etc/qubes-rpc") cfg.packages;
+  qrexecServiceDirectory = pkgs.symlinkJoin {
+    name = "qubes-rpc-services";
+    paths = qrexec_services;
+  };
 in
   with lib; {
     options.services.qubes.qrexec = {
@@ -44,6 +48,8 @@ in
         cfg.package
       ];
 
+      environment.etc."qubes-rpc".source = qrexecServiceDirectory;
+
       security.polkit.enable = true;
       security.pam.services.qrexec = {
         rootOK = true;
@@ -56,7 +62,7 @@ in
         wantedBy = ["multi-user.target"];
         after = ["systemd-modules-load.service" "xendriverdomain.service" "systemd-user-sessions.service"];
         environment = {
-          QREXEC_SERVICE_PATH = concatStringsSep ":" qrexec_services;
+          QREXEC_SERVICE_PATH = concatStringsSep ":" (["/etc/qubes-rpc"] ++ qrexec_services);
           QREXEC_MULTIPLEXER_PATH = "${cfg.package}/lib/qubes/qubes-rpc-multiplexer";
         };
 
