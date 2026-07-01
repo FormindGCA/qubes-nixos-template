@@ -10,6 +10,33 @@ in
     options.services.qubes.core = {
       enable = mkEnableOption "the core qubes services";
       networking = mkEnableOption "include core qubes networking services";
+      user = {
+        name = mkOption {
+          type = types.str;
+          default = "user";
+          description = "Default user created for the Qubes template VM.";
+        };
+        uid = mkOption {
+          type = types.int;
+          default = 1000;
+          description = "UID of the default Qubes user.";
+        };
+        gid = mkOption {
+          type = types.int;
+          default = 1000;
+          description = "GID of the default Qubes user group.";
+        };
+        home = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+          description = "Home directory for the default Qubes user. Defaults to /home/<name>.";
+        };
+        autologin = mkOption {
+          type = types.bool;
+          default = true;
+          description = "Whether to autologin the default Qubes user on getty.";
+        };
+      };
       package = mkOption {
         type = types.package;
         description = "qubes-core-agent-linux package as configured by the qubes module options";
@@ -24,36 +51,38 @@ in
           if cfg.networking
           then (pkgs.qubes-core-agent-linux.override {enableNetworking = true;})
           else (cfg.package.default);
-      in {
+        userHome =
+          if cfg.user.home != null
+          then cfg.user.home
+          else "/home/${cfg.user.name}";
+      in mkMerge [
+        {
         services.qubes.core.package = qubes-core-agent-linux;
         services.qubes.db.enable = true;
 
-        # TODO make the username configurable?
         users.groups = {
           qubes = {
             # supposedly this should be 98, however 995 matches the debian value
             gid = 995;
           };
-          user = {
-            gid = 1000;
+          ${cfg.user.name} = {
+            gid = cfg.user.gid;
           };
         };
-        users.users.user = {
+        users.users.${cfg.user.name} = {
           createHome = true;
-          group = "user";
+          group = cfg.user.name;
           extraGroups = ["qubes" "wheel"];
-          home = "/home/user";
+          home = userHome;
           isNormalUser = true;
           password = "";
           shell = pkgs.bash;
-          uid = 1000;
+          uid = cfg.user.uid;
         };
         security.sudo.wheelNeedsPassword = false;
         security.pam.services.su.text = lib.mkDefault (lib.mkBefore ''
           auth sufficient ${pkgs.linux-pam}/lib/security/pam_succeed_if.so use_uid user ingroup qubes
         '');
-        # ensure qvm-console-dispvm is logged in
-        services.getty.autologinUser = "user";
 
         fileSystems = {
           "/" = {
@@ -220,5 +249,10 @@ in
           alias nixos-rebuild="all_proxy=\$(systemctl show nix-daemon -p Environment | grep -oP '(?<=all_proxy=)[^ ]*') nixos-rebuild"
         '';
       }
+      (mkIf cfg.user.autologin {
+        # ensure qvm-console-dispvm is logged in
+        services.getty.autologinUser = cfg.user.name;
+      })
+      ]
     );
   }
