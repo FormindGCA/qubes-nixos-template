@@ -108,6 +108,17 @@
       #buildInputs = [ qubes-core-qubesdb qubes-core-vchan-xen ];
   };
 
+    pythonRuntimeDeps = with python3Packages; [
+      dbus-python
+      pygobject3
+      pyxdg
+    ] ++ [
+      qubes-core-qubesdb
+      qubesagent
+    ];
+
+    programPythonPath = python3Packages.makePythonPath pythonRuntimeDeps;
+
 in
   resholve.mkDerivation rec {
     inherit version src;
@@ -438,14 +449,7 @@ in
       };
     };
 
-    pythonPath = with python3Packages; [
-      dbus-python
-      pygobject3
-      pyxdg
-    ] ++ [
-      qubes-core-qubesdb
-      qubesagent
-    ];
+    pythonPath = pythonRuntimeDeps;
 
     dontWrapGApps = true;
 
@@ -457,10 +461,13 @@ in
     postFixup = ''
       wrapPythonPrograms
 
-      # We should wrap qubes.StartApp because it's not a normal python entry point
-      program_PYTHONPATH=$(echo "$pythonPath" | sed 's@\s@/${python3.sitePackages}:@g')
-      program_PYTHONPATH=$program_PYTHONPATH/${python3.sitePackages}
+      program_PYTHONPATH="$out/${python3.sitePackages}:${programPythonPath}"
+
+      # These are not normal Python entry points, so wrapPythonPrograms does not
+      # reliably discover every import path they need.
       wrapProgram "$out/etc/qubes-rpc/qubes.StartApp" \
+        --set PYTHONPATH "$program_PYTHONPATH"
+      wrapProgram "$out/bin/qubes-vmexec" \
         --set PYTHONPATH "$program_PYTHONPATH"
     '';
 
