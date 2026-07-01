@@ -177,20 +177,10 @@ in
       substituteInPlace Makefile --replace-fail 'SHELL = /bin/bash' 'SHELL = ${bash}/bin/bash'
 
       # skip installing qfile-unpacker / bin-qfile-unpacker as SUID
-      ls -lah 
-      sed -i 's/-m 4755/-m 755/g' qubes-rpc/Makefile
+      substituteInPlace qubes-rpc/Makefile --replace-fail '-m 4755' '-m 755'
     '';
 
     buildPhase = ''
-      # Fix for network tools paths
-      # FIXME use substituteInPlace
-      # sed 's:/sbin/ip:pkgs.iproute2/bin/ip:g' -i network/*
-      # sed 's:/bin/grep:pkgs.grep/bin/grep:g' -i network/*
-
-      # Fix for archlinux sbindir
-      # FIXME use substituteInPlace
-      # sed 's:/usr/sbin/ntpdate:/usr/bin/ntpdate:g' -i qubes-rpc/sync-ntp-clock
-
       for dir in qubes-rpc misc; do
           make -C "$dir"
       done
@@ -206,7 +196,6 @@ in
     # - figure out how to adapt service dropins?
     installPhase =
       ''
-        # install -D -m 0644 -- "boot/grub.qubes" "$out/etc/default/grub.qubes"
         make install-corevm \
             PYTHON_PREFIX_ARG="--prefix ." \
             DESTDIR="$out" \
@@ -271,26 +260,6 @@ in
         # Patch Python shebangs under etc/qubes-rpc for NixOS
         substituteInPlace "$out/etc/qubes-rpc/qubes.StartApp" --replace '#!/usr/bin/python3' "#!${python3}/bin/python3"
 
-        #mv "$out/etc/qubes-rpc/qubes.StartApp" "$out/etc/qubes-rpc/qubes.StartApp.orig"
-        #cat > "$out/etc/qubes-rpc/qubes.StartApp" <<EOT
-##!${bash}/bin/sh
-#export PYTHONPATH="${qubes-core-qubesdb}/${python3.sitePackages}:$PYTHONPATH"
-#exec ${python3}/bin/python3 "$out/etc/qubes-rpc/qubes.StartApp.orig" "\$@"
-#EOT
-        #chmod +x "$out/etc/qubes-rpc/qubes.StartApp"
-
-        #for f in `ls $out/etc/qubes-rpc/`; do
-        #  if head -n1 "$f" | grep -E '#!/usr/bin/python3'; then
-        #    substituteInPlace "$f" \
-        #      --replace '#!/usr/bin/python3' "#!${python3}/bin/python3"
-        #  elif head -n1 "$f" | grep -E '#!(/usr)?/bin/bash'; then
-        #    substituteInPlace "$f" \
-        #      --replace '#!/bin/bash' "#!${bash}/bin/bash"
-        #    substituteInPlace "$f" \
-        #      --replace '#!/usr/bin/bash' "#!${bash}/bin/bash"
-        #  fi
-        #done
-
         for path in ${lib.concatStringsSep " " scripts_using_functions}; do
           substituteInPlace "$out/$path" --replace '/usr/lib/qubes/init/functions' "functions"
         done
@@ -298,20 +267,6 @@ in
         substituteInPlace "$out/lib/qubes/init/bind-dirs.sh" --replace \
           "for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do" \
           "for source_folder in $out/lib/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do"
-
-        # Install systemd script allowing to automount /lib/modules
-        # install -m 644 "archlinux/PKGBUILD.qubes-ensure-lib-modules.service" "$out/usr/lib/systemd/system/qubes-ensure-lib-modules.service"
-
-        # Install pacman hook to update desktop icons
-        # mkdir -p "$out/usr/share/libalpm/hooks/"
-        # install -m 644 "archlinux/PKGBUILD.qubes-update-desktop-icons.hook" "$out/usr/share/libalpm/hooks/qubes-update-desktop-icons.hook"
-
-        # Install pacman hook to notify dom0 about successful upgrade
-        # install -m 644 "archlinux/PKGBUILD.qubes-post-upgrade.hook" "$out/usr/share/libalpm/hooks/qubes-post-upgrade.hook"
-
-        # Install pacman.d drop-ins (at least 1 drop-in must be installed or pacman will fail)
-        # mkdir -p -m 0755 "$out/etc/pacman.d"
-        # install -m 644 "archlinux/PKGBUILD-qubes-pacman-options.conf" "$out/etc/pacman.d/10-qubes-options.conf"
 
         # remove the default VMExec definition since we need to modify it's PATH based on user args in the updates module
         rm "$out/etc/qubes-rpc/qubes.VMExec"
