@@ -131,13 +131,18 @@ with lib; {
           text = ''
             #!${pkgs.stdenv.shell}
 
-            export PATH=${lib.makeBinPath (with pkgs; [coreutils gnutar python3 upgradesStatusNotify getPackages nixosRebuildWrapper])}:$PATH
+            export PATH=${lib.makeBinPath (with pkgs; [bash coreutils fakeroot gawk gnugrep gnused gnutar python3 systemd upgradesStatusNotify getPackages nixosRebuildWrapper])}:/run/current-system/sw/bin:$PATH
             exec ${config.services.qubes.core.package.out}/bin/qubes-vmexec "$@"
           '';
           executable = true;
           destination = "/etc/qubes-rpc/qubes.VMExec";
         };
       in {
+        systemd.tmpfiles.rules = [
+          "d /usr/lib 0755 root root"
+          "d /usr/lib/qubes 0755 root root"
+          "L+ /usr/lib/qubes/upgrades-status-notify - - - - ${upgradesStatusNotify}/bin/upgrades-status-notify"
+        ];
         environment.systemPackages = [
           nixosRebuildWrapper
         ];

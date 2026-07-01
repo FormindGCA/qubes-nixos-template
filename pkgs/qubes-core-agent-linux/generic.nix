@@ -270,6 +270,9 @@ in
 
         # Patch Python shebangs under etc/qubes-rpc for NixOS
         substituteInPlace "$out/etc/qubes-rpc/qubes.StartApp" --replace '#!/usr/bin/python3' "#!${python3}/bin/python3"
+        substituteInPlace "$out/lib/python3.13/site-packages/qubesagent/vmexec.py" \
+          --replace-fail '    os.execvp(command[0], command)' \
+          $'    if command[0].endswith(b\'.py\'):\n        command = [b\'${python3}/bin/python3\'] + command\n    os.execvp(command[0], command)'
 
         for path in ${lib.concatStringsSep " " scripts_using_functions}; do
           substituteInPlace "$out/$path" --replace '/usr/lib/qubes/init/functions' "functions"
