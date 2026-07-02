@@ -217,11 +217,11 @@ in
         systemd.services.qubes-rootfs-resize = {
           wantedBy = ["multi-user.target"];
           after = ["qubes-sysinit.service"];
-          before = ["local-fs.target"];
 
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
+            TimeoutSec = 30;
             ExecStart = ["" "${qubes-core-agent-linux}/lib/qubes/init/resize-rootfs-if-needed.sh"];
           };
         };
