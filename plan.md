@@ -18,12 +18,14 @@ Stabilize the Qubes/NixOS integration before doing larger cleanups. Prefer small
 - The generated system must expose qrexec services through `/etc/qubes-rpc` for Qubes compatibility.
 - `/usr/share` must resolve to the NixOS system profile because Qubes tools use hard-coded `/usr/share` paths.
 - `/usr/lib/qubes/upgrades-status-notify` must resolve because the upstream VM update agent calls it directly.
+- Qubes appmenu icon export must use NixOS paths instead of hard-coded `/usr/lib/qubes` and `/usr/share/icons` assumptions.
 - Every refactor should be validated with a full system build and at least one targeted evaluation of the affected paths.
 
 ## Next Milestone: Split Core Agent Package Roles
 
-1. Re-test networking in an AppVM based on the template.
-2. Keep legacy scripted initrd for now; systemd initrd currently breaks TemplateVM boot.
+1. Re-test `qvm-sync-appmenus <template-name>` in dom0 and confirm icon warnings are fixed or reduced.
+2. Re-test networking in an AppVM based on the template.
+3. Keep legacy scripted initrd for now; systemd initrd currently breaks TemplateVM boot.
 
 ## Validation For Package Role Refactor
 
@@ -78,3 +80,4 @@ Also verify:
 - Cleaned `qubes-linux-utils` by replacing the `lib.extendDerivation` workaround with an explicit wrapper derivation that preserves the post-resholve udev rule fixups.
 - Removed stale packaging comments from core qrexec, core agent, and GUI agent expressions.
 - Implemented the NixOS side of application menu export by exposing `/etc/qubes`, fixing appmenu sync script paths, and wrapping `qubes.GetAppmenus` with the required PATH.
+- Patched appmenu icon export so `qubes.GetImageRGBA` calls the packaged `xdg-icon`, and `xdg-icon` discovers icon themes through `XDG_DATA_DIRS` instead of requiring `/usr/share/icons` to exist.
