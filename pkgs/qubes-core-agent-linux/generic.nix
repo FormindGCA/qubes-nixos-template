@@ -274,6 +274,15 @@ in
         substituteInPlace "$out/lib/qubes/init/resize-rootfs-if-needed.sh" \
           --replace-fail '/usr/lib/qubes/resize-rootfs' 'resize-rootfs'
 
+        # run dumpe2fs once with a timeout to prevent hangs during early boot
+        cat > /tmp/patch-resize.sed << 'SEDEOF'
+/^    ext4_block_count=\$(dumpe2fs/,/^    ext4_block_size=\$(dumpe2fs)/c\
+    dumpe2fs_output=$(timeout 10 dumpe2fs /dev/mapper/dmroot) || { echo "dumpe2fs failed, skipping resize" >&2; exit 0; }\
+    ext4_block_count=$(echo "$dumpe2fs_output" | grep '^Block count:' | sed -E 's/Block count:[[:space:]]+//')\
+    ext4_block_size=$(echo "$dumpe2fs_output" | grep '^Block size:' | sed -E 's/Block size:[[:space:]]+//')
+SEDEOF
+        sed -i -f /tmp/patch-resize.sed "$out/lib/qubes/init/resize-rootfs-if-needed.sh"
+
         # remove the default VMExec definition since we need to modify it's PATH based on user args in the updates module
         rm "$out/etc/qubes-rpc/qubes.VMExec"
         # also remove VMExecGUI since it points to VMExec and will be a dangling link
@@ -428,6 +437,7 @@ in
           [
             "cannot:${e2fsprogs}/bin/fsck.ext4"
             "cannot:${e2fsprogs}/bin/mkfs.ext4"
+            "cannot:${coreutils}/bin/timeout"
             "cannot:${kmod}/bin/modprobe"
             "cannot:${lib.getBin lvm2}/bin/dmsetup"
             "cannot:${systemd}/bin/systemctl"
