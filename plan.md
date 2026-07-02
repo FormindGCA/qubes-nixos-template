@@ -23,7 +23,7 @@ Stabilize the Qubes/NixOS integration before doing larger cleanups. Prefer small
 ## Next Milestone: Split Core Agent Package Roles
 
 1. Re-test networking in an AppVM based on the template.
-2. Re-test boot with systemd initrd in a real TemplateVM.
+2. Keep legacy scripted initrd for now; systemd initrd currently breaks TemplateVM boot.
 
 ## Validation For Package Role Refactor
 
@@ -51,7 +51,7 @@ Also verify:
 
 1. Clean `qubes-linux-utils` and investigate the `extendDerivation` workaround.
 2. Clean remaining module TODOs in `db.nix` and `qrexec.nix`.
-3. If systemd initrd boots correctly in Qubes, remove the remaining initrd migration notes.
+3. Revisit systemd initrd later in an isolated boot-debug branch before NixOS 26.11.
 4. Document qrexec/RPC package invariants in the README once they are stable.
 5. Continue reducing ad hoc `substituteInPlace` and `resholve` workarounds package by package.
 
@@ -75,5 +75,4 @@ Also verify:
 - Made `qubes-nixos-rebuild` pass `--flake <configurationDirectory>#<flakeConfiguration>` instead of relying on the VM hostname.
 - Validated Qubes Updater / `qubes.VMExec` in a real template VM.
 - Replaced deprecated default `--update-input` flags with `services.qubes.updates.updateInputs` and `nix flake update`.
-- Confirmed the remaining `system` renamed warning disappears when the legacy scripted initrd path is disabled, so it should be handled with the initrd migration.
-- Switched the Qubes profile to systemd initrd and explicitly included Xen frontend/grant modules in the initrd closure. Build warnings for scripted initrd and `system` rename are gone; real TemplateVM boot still needs validation.
+- Confirmed the remaining `system` renamed warning disappears when the legacy scripted initrd path is disabled, but systemd initrd broke real TemplateVM boot and was reverted.

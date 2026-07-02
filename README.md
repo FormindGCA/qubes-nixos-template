@@ -62,6 +62,8 @@ Some upstream Qubes tools still use hard-coded `/usr/share` paths. The core modu
 
 The Python RPC entry points are wrapped with explicit `PYTHONPATH` and library paths. In particular, `qubes.StartApp` and `qubes.VMExec` need to import `qubesagent` and `qubesdb` outside a normal Python package entry point.
 
+The Qubes profile intentionally keeps the legacy scripted initrd for now. The systemd initrd path builds, but has been tested to break TemplateVM boot in Qubes, so the `Scripted initrd is deprecated` warning is expected until that migration is debugged separately.
+
 When using Qubes OS Updater on a cloned or renamed template, set `services.qubes.updates.flakeConfiguration` to the flake configuration name to build. By default the updater uses the VM hostname, so a template named `formol` will look for `nixosConfigurations.formol`. If the flake only defines `nixosConfigurations.nixos`, configure:
 
 ```nix
