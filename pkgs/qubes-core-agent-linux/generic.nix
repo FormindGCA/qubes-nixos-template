@@ -280,7 +280,7 @@ in
 [ -b /dev/xvda ] || { echo "xvda not found, skipping resize" >&2; exit 0; }\
 [ -b /dev/mapper/dmroot ] || { echo "dmroot not found, skipping resize" >&2; exit 0; }
 
-s|^if \[ "\$\(blockdev --getro /dev/xvda\)" -eq "1" \]; then$|blockdev_tmp=$(timeout 5 blockdev --getro /dev/xvda) || { echo "blockdev failed, skipping resize" >&2; exit 0; }\nif [ "$blockdev_tmp" -eq "1" ]; then|
+s@^if \[ "\$\(blockdev --getro /dev/xvda\)" -eq "1" \]; then$@blockdev_tmp=$(timeout 5 blockdev --getro /dev/xvda) || { echo "blockdev failed, skipping resize" >&2; exit 0; }\nif [ "$blockdev_tmp" -eq "1" ]; then@
 
 /^    ext4_block_count=\$(dumpe2fs/,/^    ext4_block_size=\$(dumpe2fs)/c\
     dumpe2fs_output=$(timeout 10 dumpe2fs /dev/mapper/dmroot) || { echo "dumpe2fs failed, skipping resize" >&2; exit 0; }\
