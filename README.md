@@ -129,14 +129,15 @@ Host github.com
 - memory reporting / ballooning
 - qubes update checks
 - qubes update triggers ( requires unmerged upstream changes )
-- application menu export via `qubes.GetAppmenus`
+- application menu export and dom0 shortcut sync via `qubes.GetAppmenus`
+- application icon export via `qubes.GetImageRGBA` for normal desktop icons
 - usb proxy
 - building an rpm for the templatevm
 - update proxy
 
 ### what doesn't work / untested
 - qrexec startup isn't clean, commands can fail initially
-- application shortcut population in dom0 still needs real Qubes App Menu validation
+- some applications with missing or unusual icons may still show icon warnings during appmenu sync
 - using a non-xen provided kernel
 - using as netvm or usbvm
 - time sync via rpc ( currently handled is systemd-timesyncd, but per vm ntp sync creates more attack surface area? )

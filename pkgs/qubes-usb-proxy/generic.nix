@@ -45,8 +45,8 @@ resholve.mkDerivation rec {
 
     substituteInPlace "$out/lib/qubes/usb-reset" --replace "#!/usr/bin/python3" "#!${python3}/bin/python3"
 
-    # we have udevadm by way of kmod, skip the check since resholve won't handle it
-    substituteInPlace "$out/lib/qubes/usb-import" --replace '[ -f "/usr/bin/udevadm" ] && ' ' '
+    # keep the file-check but use the correct path since resholve doesn't resolve string args to [
+    substituteInPlace "$out/lib/qubes/usb-import" --replace '/usr/bin/udevadm' '${systemd}/bin/udevadm'
 
     # sudo isn't handled by resholve. ideally we'd just do a single substituteInPlace for sudo here
     # but the keep statement would result in usb-export being left unresolved. we can hack around this

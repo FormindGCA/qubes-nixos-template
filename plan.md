@@ -21,12 +21,15 @@ Stabilize the Qubes/NixOS integration before doing larger cleanups. Prefer small
 - Qubes appmenu icon export must use NixOS paths instead of hard-coded `/usr/lib/qubes` and `/usr/share/icons` assumptions.
 - Every refactor should be validated with a full system build and at least one targeted evaluation of the affected paths.
 
-## Next Milestone: Split Core Agent Package Roles
+## Current Blocker
 
-1. Re-test networking in an AppVM based on the template.
-2. Keep legacy scripted initrd for now; systemd initrd currently breaks TemplateVM boot.
+1. Keep legacy scripted initrd for now; systemd initrd currently breaks TemplateVM boot.
 
-## Validation For Package Role Refactor
+## Next Cleanup
+
+1. Continue reducing ad hoc `substituteInPlace` and `resholve` workarounds package by package.
+
+## Validation Checklist
 
 Run after each commit in the milestone:
 
@@ -49,10 +52,9 @@ Also verify:
 - application shortcut sync from dom0
 - basic qrexec command execution
 
-## Later Cleanup
+## Later Work
 
 1. Revisit systemd initrd later in an isolated boot-debug branch before NixOS 26.11.
-2. Continue reducing ad hoc `substituteInPlace` and `resholve` workarounds package by package.
 
 ## Recently Completed
 
@@ -82,3 +84,5 @@ Also verify:
 - Patched appmenu icon export so `qubes.GetImageRGBA` calls the packaged `xdg-icon`, has explicit image conversion tools in `PATH`, limits generated icons to 128px, and `xdg-icon` discovers icon themes through `XDG_DATA_DIRS` instead of requiring `/usr/share/icons` to exist.
 - Validated appmenu icon sync in dom0; remaining icon warnings are limited to applications with missing or unusual icons.
 - Registered the networking-enabled core agent package with udev when Qubes networking is enabled, so generated systems include `99-qubes-network.rules` without importing duplicate upstream systemd units.
+- Validated networking in an AppVM based on the template.
+- Reduced usb-proxy workaround by keeping the `udevadm` file-check instead of removing it entirely; replaced the path with the correct Nix store path.

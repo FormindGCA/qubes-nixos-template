@@ -188,11 +188,6 @@ in
     # Don't move doc, needed in the subsequent packaging
     forceShare = ["man" "info"];
 
-    # FIXME
-    # - finish path fixup
-    # - investigate which archlinux specific installs need replacement
-    # - fixup services in lib/systemd/system/
-    # - figure out how to adapt service dropins?
     installPhase =
       ''
         make install-corevm \
