@@ -274,8 +274,14 @@ in
         substituteInPlace "$out/lib/qubes/init/resize-rootfs-if-needed.sh" \
           --replace-fail '/usr/lib/qubes/resize-rootfs' 'resize-rootfs'
 
-        # run dumpe2fs once with a timeout to prevent hangs during early boot
+        # add device checks and timeouts to prevent hangs during early boot
         cat > /tmp/patch-resize.sed << 'SEDEOF'
+/^set -e$/a\
+[ -b /dev/xvda ] || { echo "xvda not found, skipping resize" >&2; exit 0; }\
+[ -b /dev/mapper/dmroot ] || { echo "dmroot not found, skipping resize" >&2; exit 0; }
+
+s|^if \[ "\$\(blockdev --getro /dev/xvda\)" -eq "1" \]; then$|blockdev_tmp=$(timeout 5 blockdev --getro /dev/xvda) || { echo "blockdev failed, skipping resize" >&2; exit 0; }\nif [ "$blockdev_tmp" -eq "1" ]; then|
+
 /^    ext4_block_count=\$(dumpe2fs/,/^    ext4_block_size=\$(dumpe2fs)/c\
     dumpe2fs_output=$(timeout 10 dumpe2fs /dev/mapper/dmroot) || { echo "dumpe2fs failed, skipping resize" >&2; exit 0; }\
     ext4_block_count=$(echo "$dumpe2fs_output" | grep '^Block count:' | sed -E 's/Block count:[[:space:]]+//')\
@@ -438,6 +444,7 @@ SEDEOF
             "cannot:${e2fsprogs}/bin/fsck.ext4"
             "cannot:${e2fsprogs}/bin/mkfs.ext4"
             "cannot:${coreutils}/bin/timeout"
+            "cannot:${util-linux}/bin/blockdev"
             "cannot:${kmod}/bin/modprobe"
             "cannot:${lib.getBin lvm2}/bin/dmsetup"
             "cannot:${systemd}/bin/systemctl"
