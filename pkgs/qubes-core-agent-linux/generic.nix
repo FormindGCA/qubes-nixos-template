@@ -272,7 +272,7 @@ in
           "sources=( \"$out/lib/qubes-bind-dirs.d\" )"
 
         substituteInPlace "$out/lib/qubes/init/resize-rootfs-if-needed.sh" \
-          --replace-fail '/usr/lib/qubes/resize-rootfs' "$out/lib/qubes/resize-rootfs"
+          --replace-fail '/usr/lib/qubes/resize-rootfs' 'resize-rootfs'
 
         # remove the default VMExec definition since we need to modify it's PATH based on user args in the updates module
         rm "$out/etc/qubes-rpc/qubes.VMExec"
@@ -376,7 +376,6 @@ in
           "/usr/lib/qubes/qubes-fs-tree-check" = true;
           "/usr/lib/qubes/qubes-setup-dnat-to-ns" = true;
           "/usr/lib/qubes/qvm_nautilus_bookmark.sh" = true;
-          "/usr/lib/qubes/resize-rootfs" = true;
           "/usr/lib/qubes/update-proxy-configs" = true;
           "/lib/systemd/systemd-sysctl" = true;
           "/sbin/ip" = true;
