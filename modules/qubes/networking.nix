@@ -13,6 +13,7 @@ with lib; {
     services.qubes.core.enable = true;
 
     services.resolved.enable = true;
+    services.udev.packages = [config.services.qubes.core.networkingPackage];
 
     systemd.services.qubes-network-uplink = {
       # ensure the service is started on boot, since Install is ignored

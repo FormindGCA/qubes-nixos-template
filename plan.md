@@ -23,9 +23,8 @@ Stabilize the Qubes/NixOS integration before doing larger cleanups. Prefer small
 
 ## Next Milestone: Split Core Agent Package Roles
 
-1. Re-test `qvm-sync-appmenus <template-name>` in dom0 and confirm icon warnings are fixed or reduced.
-2. Re-test networking in an AppVM based on the template.
-3. Keep legacy scripted initrd for now; systemd initrd currently breaks TemplateVM boot.
+1. Re-test networking in an AppVM based on the template.
+2. Keep legacy scripted initrd for now; systemd initrd currently breaks TemplateVM boot.
 
 ## Validation For Package Role Refactor
 
@@ -81,3 +80,5 @@ Also verify:
 - Removed stale packaging comments from core qrexec, core agent, and GUI agent expressions.
 - Implemented the NixOS side of application menu export by exposing `/etc/qubes`, fixing appmenu sync script paths, and wrapping `qubes.GetAppmenus` with the required PATH.
 - Patched appmenu icon export so `qubes.GetImageRGBA` calls the packaged `xdg-icon`, has explicit image conversion tools in `PATH`, limits generated icons to 128px, and `xdg-icon` discovers icon themes through `XDG_DATA_DIRS` instead of requiring `/usr/share/icons` to exist.
+- Validated appmenu icon sync in dom0; remaining icon warnings are limited to applications with missing or unusual icons.
+- Registered the networking-enabled core agent package with udev when Qubes networking is enabled, so generated systems include `99-qubes-network.rules` without importing duplicate upstream systemd units.
