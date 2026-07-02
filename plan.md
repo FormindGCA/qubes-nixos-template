@@ -45,6 +45,7 @@ Also verify:
 
 - Qubes Updater / `qubes.VMExec`
 - networking in an AppVM based on the template
+- application shortcut sync from dom0
 - basic qrexec command execution
 
 ## Later Cleanup
@@ -75,3 +76,5 @@ Also verify:
 - Confirmed the remaining `system` renamed warning disappears when the legacy scripted initrd path is disabled, but systemd initrd broke real TemplateVM boot and was reverted.
 - Removed stale module TODOs in `db.nix` and `qrexec.nix`.
 - Cleaned `qubes-linux-utils` by replacing the `lib.extendDerivation` workaround with an explicit wrapper derivation that preserves the post-resholve udev rule fixups.
+- Removed stale packaging comments from core qrexec, core agent, and GUI agent expressions.
+- Implemented the NixOS side of application menu export by exposing `/etc/qubes`, fixing appmenu sync script paths, and wrapping `qubes.GetAppmenus` with the required PATH.

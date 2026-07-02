@@ -129,13 +129,14 @@ Host github.com
 - memory reporting / ballooning
 - qubes update checks
 - qubes update triggers ( requires unmerged upstream changes )
+- application menu export via `qubes.GetAppmenus`
 - usb proxy
 - building an rpm for the templatevm
 - update proxy
 
 ### what doesn't work / untested
 - qrexec startup isn't clean, commands can fail initially
-- populating application shortcuts
+- application shortcut population in dom0 still needs real Qubes App Menu validation
 - using a non-xen provided kernel
 - using as netvm or usbvm
 - time sync via rpc ( currently handled is systemd-timesyncd, but per vm ntp sync creates more attack surface area? )

@@ -47,10 +47,7 @@
   umount,
   util-linux,
   xdg-utils,
-  # TODO deprecated
-  #xorg,
   zenity,
-  # FIXME networking optional
   networkmanager,
   tinyproxy,
   nftables,
@@ -97,15 +94,6 @@
       inherit version src;
       format = "setuptools"; # default, can be omitted if using setuptools
 
-      # If setup.py is at repo root (it is upstream), we can use src directly.
-      # If not, add `srcSubdir = ".";` or similar as needed.
-      #src = "${src}/python";
-
-      #preBuild = ''
-      #  export CFLAGS="-I${src}/include"
-      #'';
-
-      #buildInputs = [ qubes-core-qubesdb qubes-core-vchan-xen ];
   };
 
     pythonRuntimeDeps = with python3Packages; [
@@ -246,6 +234,12 @@ in
 
         # Fixup paths
         substituteInPlace "$out/bin/qubes-session-autostart" --replace "QUBES_XDG_CONFIG_DROPINS = '/etc/qubes/autostart'" "QUBES_XDG_CONFIG_DROPINS = \"$out/etc/qubes/autostart\""
+
+        substituteInPlace "$out/lib/qubes/qubes-trigger-sync-appmenus.sh" \
+          --replace '. /usr/lib/qubes/init/functions' ". $out/lib/qubes/init/functions" \
+          --replace '/usr/lib/qubes/qrexec-client-vm' "${qubes-core-qrexec}/lib/qubes/qrexec-client-vm"
+        substituteInPlace "$out/etc/qubes/post-install.d/10-qubes-core-agent-appmenus.sh" \
+          --replace '/usr/lib/qubes/qubes-trigger-sync-appmenus.sh' "$out/lib/qubes/qubes-trigger-sync-appmenus.sh"
 
         # we lied about qrexec-client-vm not execing :)
         substituteInPlace "$out/bin/qvm-copy" --replace "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
@@ -474,6 +468,8 @@ in
         --prefix LD_LIBRARY_PATH : "$program_LIBRARY_PATH" \
         --prefix PATH : "/run/wrappers/bin:/home/user/.nix-profile/bin:/nix/profile/bin:/home/user/.local/state/nix/profile/bin:/etc/profiles/per-user/user/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin" \
         --prefix XDG_DATA_DIRS : "/run/current-system/sw/share:/etc/profiles/per-user/user/share:/home/user/.nix-profile/share"
+      wrapProgram "$out/etc/qubes-rpc/qubes.GetAppmenus" \
+        --prefix PATH : "$out/bin:${coreutils}/bin:${findutils}/bin:${gawk}/bin:${qubes-core-qubesdb}/bin:/run/current-system/sw/bin"
       wrapProgram "$out/bin/qubes-vmexec" \
         --set PYTHONPATH "$program_PYTHONPATH" \
         --prefix LD_LIBRARY_PATH : "$program_LIBRARY_PATH"

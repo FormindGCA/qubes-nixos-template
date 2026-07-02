@@ -166,6 +166,7 @@ in
         environment.systemPackages = [
           qubes-core-agent-linux
         ];
+        environment.etc."qubes".source = "${qubes-core-agent-linux}/etc/qubes";
         services.udev.packages = [
           pkgs.qubes-linux-utils
           qubes-core-agent-linux
@@ -221,9 +222,6 @@ in
             ExecStart = ["" "${qubes-core-agent-linux}/lib/qubes/init/resize-rootfs-if-needed.sh"];
           };
         };
-
-        #systemd.services.qubes-sync-time = {
-        # TODO how to setup the timer?
 
         systemd.services.qubes-sysinit = {
           # ensure the service is started on boot, since Install is ignored

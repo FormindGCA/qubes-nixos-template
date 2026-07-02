@@ -49,12 +49,6 @@ resholve.mkDerivation rec {
     make all-vm
   '';
 
-  # FIXME
-  # - need to rewrite lib/qubes-qrexec-policy-agent autostart ( `exec qrexec-policy-agent "$@"` )
-  # - need to add qubes-qrexec-agent.service service
-  # - need to rewrite /etc/qubes-rpc in a few places
-  # - subs in qubes-rpc-multiplexer
-
   installPhase = ''
     make install-base DESTDIR=$out PREFIX=/ PYTHON_PREFIX_ARG="--prefix ." LIBDIR="/lib" SYSLIBDIR="/lib"
     make install-vm DESTDIR=$out PREFIX=/ PYTHON_PREFIX_ARG="--prefix ." LIBDIR="/lib" SYSLIBDIR="/lib"

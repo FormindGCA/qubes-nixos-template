@@ -129,7 +129,6 @@ resholve.mkDerivation rec {
 
   dontMoveSystemdUserUnits = true;
 
-  # FIXME sub xdg autostart paths
   # FIXME nixgl
   installPhase = ''
     make install-rh-agent \
