@@ -18,7 +18,6 @@ in
       environment.systemPackages = [
         pkgs.qubes-core-qubesdb
       ];
-      # TODO  just override parts of existing service?
       systemd.services.qubes-db = {
         description = "Qubes DB agent";
         after = ["systemd-modules-load.service"];

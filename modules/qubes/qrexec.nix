@@ -55,7 +55,6 @@ in
         rootOK = true;
       };
 
-      # TODO  just override parts of existing service?
       systemd.services.qubes-qrexec-agent = {
         description = "Qubes remote exec agent";
         requires = ["qubes-db.service"];

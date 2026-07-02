@@ -61,7 +61,6 @@
       make all
     '';
 
-    # FIXME need to sub and move qubes-meminfo-writer
     installPhase = ''
       make install \
           PYTHON_PREFIX_ARG="--prefix ." \
@@ -110,8 +109,7 @@
     };
   };
 in
-  # FIXME stupid hack, can't figure out how to do these fixups otherwise
-  lib.extendDerivation true {} (stdenv.mkDerivation {
+  stdenv.mkDerivation {
     src = resholved;
     inherit version;
     pname = name;
@@ -124,4 +122,6 @@ in
       substituteInPlace "$out/lib/udev/rules.d/99-qubes-usb.rules" --replace '/usr/lib/qubes/' "${resholved}/lib/qubes/"
       substituteInPlace "$out/lib/udev/rules.d/99-qubes-block.rules" --replace '/usr/lib/qubes/' "${resholved}/lib/qubes/"
     '';
-  })
+
+    meta = resholved.meta;
+  }

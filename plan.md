@@ -49,11 +49,8 @@ Also verify:
 
 ## Later Cleanup
 
-1. Clean `qubes-linux-utils` and investigate the `extendDerivation` workaround.
-2. Clean remaining module TODOs in `db.nix` and `qrexec.nix`.
-3. Revisit systemd initrd later in an isolated boot-debug branch before NixOS 26.11.
-4. Document qrexec/RPC package invariants in the README once they are stable.
-5. Continue reducing ad hoc `substituteInPlace` and `resholve` workarounds package by package.
+1. Revisit systemd initrd later in an isolated boot-debug branch before NixOS 26.11.
+2. Continue reducing ad hoc `substituteInPlace` and `resholve` workarounds package by package.
 
 ## Recently Completed
 
@@ -76,3 +73,5 @@ Also verify:
 - Validated Qubes Updater / `qubes.VMExec` in a real template VM.
 - Replaced deprecated default `--update-input` flags with `services.qubes.updates.updateInputs` and `nix flake update`.
 - Confirmed the remaining `system` renamed warning disappears when the legacy scripted initrd path is disabled, but systemd initrd broke real TemplateVM boot and was reverted.
+- Removed stale module TODOs in `db.nix` and `qrexec.nix`.
+- Cleaned `qubes-linux-utils` by replacing the `lib.extendDerivation` workaround with an explicit wrapper derivation that preserves the post-resholve udev rule fixups.
