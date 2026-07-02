@@ -14,6 +14,7 @@ Stabilize the Qubes/NixOS integration before doing larger cleanups. Prefer small
 - `qubes.StartApp` and `qubes.VMExec` must run with a Python environment that can import `qubesagent` and `qubesdb`.
 - `qubes.VMExec` must execute updater-injected Python commands with the Nix Python, because dom0 calls `/usr/bin/python3` and injected scripts use `/usr/bin/python3` shebangs.
 - Qubes Updater's injected agent does not support NixOS; `qubes.VMExec` must intercept that agent entrypoint and run `qubes-nixos-rebuild` instead.
+- `qubes-nixos-rebuild` and update checks must use the same `services.qubes.updates.flakeConfiguration` target.
 - The generated system must expose qrexec services through `/etc/qubes-rpc` for Qubes compatibility.
 - `/usr/share` must resolve to the NixOS system profile because Qubes tools use hard-coded `/usr/share` paths.
 - `/usr/lib/qubes/upgrades-status-notify` must resolve because the upstream VM update agent calls it directly.
@@ -71,3 +72,4 @@ Also verify:
 - Documented the qrexec, `/etc/qubes-rpc`, `/usr/share`, and Python wrapper invariants in the README.
 - Made `qubes.VMExec` run updater-injected `.py` commands with the Nix Python and exposed `/usr/lib/qubes/upgrades-status-notify`.
 - Intercepted Qubes Updater's injected agent entrypoint and redirected it to `qubes-nixos-rebuild`.
+- Made `qubes-nixos-rebuild` pass `--flake <configurationDirectory>#<flakeConfiguration>` instead of relying on the VM hostname.

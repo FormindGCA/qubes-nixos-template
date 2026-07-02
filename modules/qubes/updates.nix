@@ -114,9 +114,16 @@ with lib; {
           # in update-proxy-configs we might set proxy via an override
           export all_proxy=$(systemctl show nix-daemon -p Environment | grep -oP '(?<=all_proxy=)[^ ]*')
 
+          ${
+            if cfg.flakeConfiguration == null
+            then ''flakeConfig="$(${pkgs.nettools}/bin/hostname)"''
+            else ''flakeConfig=${lib.escapeShellArg cfg.flakeConfiguration}''
+          }
+          flakeTarget=${lib.escapeShellArg cfg.configurationDirectory}#$flakeConfig
+
           # by default switch to the new generation, updating the system
           if [ $# -eq 0 ]; then
-            ${config.system.build.nixos-rebuild}/bin/nixos-rebuild switch ${toString cfg.flags}
+            ${config.system.build.nixos-rebuild}/bin/nixos-rebuild switch --flake "$flakeTarget" ${toString cfg.flags}
           else
             ${config.system.build.nixos-rebuild}/bin/nixos-rebuild "$@"
           fi

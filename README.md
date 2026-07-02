@@ -62,6 +62,12 @@ Some upstream Qubes tools still use hard-coded `/usr/share` paths. The core modu
 
 The Python RPC entry points are wrapped with explicit `PYTHONPATH` and library paths. In particular, `qubes.StartApp` and `qubes.VMExec` need to import `qubesagent` and `qubesdb` outside a normal Python package entry point.
 
+When using Qubes OS Updater on a cloned or renamed template, set `services.qubes.updates.flakeConfiguration` to the flake configuration name to build. By default the updater uses the VM hostname, so a template named `formol` will look for `nixosConfigurations.formol`. If the flake only defines `nixosConfigurations.nixos`, configure:
+
+```nix
+services.qubes.updates.flakeConfiguration = "nixos";
+```
+
 ## alternative install via iso
 
 for those that want to avoid installing anything in dom0, these instructions will allow you to install to
