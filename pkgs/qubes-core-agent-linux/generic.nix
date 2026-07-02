@@ -232,11 +232,9 @@ in
         substituteInPlace "$out/etc/qubes/post-install.d/10-qubes-core-agent-appmenus.sh" \
           --replace-fail '/usr/lib/qubes/qubes-trigger-sync-appmenus.sh' "$out/lib/qubes/qubes-trigger-sync-appmenus.sh"
 
-        # we lied about qrexec-client-vm not execing :)
-        substituteInPlace "$out/bin/qvm-copy" --replace-fail "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
-        substituteInPlace "$out/bin/qvm-copy-to-vm" --replace-fail "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
-        substituteInPlace "$out/bin/qvm-move" --replace-fail "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
-        substituteInPlace "$out/bin/qvm-move-to-vm" --replace-fail "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
+        # qvm-copy now uses $scriptdir relative paths; only qrexec-client-vm needs
+        # explicit store path since it lives in qubes-core-qrexec, not here
+        substituteInPlace "$out/bin/qvm-copy" --replace-fail '$scriptdir/qubes/qrexec-client-vm' "${qubes-core-qrexec}/lib/qubes/qrexec-client-vm"
         
         # patching qvm-open-in-dvm
         substituteInPlace "$out/bin/qvm-open-in-dvm" --replace-fail "/bin/sh -c" "${bash}/bin/sh -c"
