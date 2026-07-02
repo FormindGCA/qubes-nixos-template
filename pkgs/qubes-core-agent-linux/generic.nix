@@ -4,7 +4,6 @@
   resholve,
   makeWrapper,
   wrapGAppsNoGuiHook,
-  stdenv,
   bash,
   coreutils,
   diffutils,
@@ -112,8 +111,6 @@ in
     inherit version src;
     pname = "qubes-core-agent-linux";
 
-    #PKG_CONFIG_SYSTEMD_SYSTEMDSYSTEMUNITDIR = "${placeholder "out"}/lib/systemd/system";
-
     nativeBuildInputs =
       [
         bash
@@ -129,7 +126,6 @@ in
         qubes-linux-utils
         shared-mime-info
         wrapGAppsNoGuiHook
-        # xorg.libX11
         libx11
       ]
       ++ (with python3Packages; [
@@ -277,6 +273,9 @@ in
           "for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do" \
           "for source_folder in $out/lib/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do"
 
+        substituteInPlace "$out/lib/qubes/init/resize-rootfs-if-needed.sh" \
+          --replace-fail '/usr/lib/qubes/resize-rootfs' "$out/lib/qubes/resize-rootfs"
+
         # remove the default VMExec definition since we need to modify it's PATH based on user args in the updates module
         rm "$out/etc/qubes-rpc/qubes.VMExec"
         # also remove VMExecGUI since it points to VMExec and will be a dangling link
@@ -410,7 +409,6 @@ in
             psmisc
             qubes-core-qrexec
             qubes-core-qubesdb
-            stdenv.cc.libc
             systemd
             umount
             util-linux

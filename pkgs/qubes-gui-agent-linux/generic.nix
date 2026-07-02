@@ -36,14 +36,12 @@
   util-macros,
   which,
   xen,
-  #xfce,
   xfce4-settings,
   xfconf,
   xprop,
   xinit,
   xsetroot,
   xrandr,
-  #xorg,
   xorg-server,
   zenity,
   dbus,
@@ -103,8 +101,6 @@ resholve.mkDerivation rec {
       systemd
       dbus
       xfconf
-      # xdg-user-dirs-update
-      # xorg
       libxcomposite
       libxdamage
       libXcursor
@@ -129,7 +125,6 @@ resholve.mkDerivation rec {
 
   dontMoveSystemdUserUnits = true;
 
-  # FIXME nixgl
   installPhase = ''
     make install-rh-agent \
         DESTDIR="$out" \
@@ -241,7 +236,6 @@ resholve.mkDerivation rec {
         "cannot:${systemd}/bin/systemctl"
         "cannot:${xfce4-settings}/bin/xfsettingsd"
         "cannot:${xfconf}/bin/xfconf-query"
-        # lies
         "cannot:bin/qubes-gui-runuser"
         "cannot:${util-linux}/bin/runuser"
       ];

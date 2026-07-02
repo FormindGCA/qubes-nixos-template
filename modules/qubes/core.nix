@@ -215,10 +215,13 @@ in
         };
 
         systemd.services.qubes-rootfs-resize = {
-          # ensure the service is started on boot, since Install is ignored
-          #wantedBy = ["multi-user.target"];
+          wantedBy = ["multi-user.target"];
+          after = ["qubes-sysinit.service"];
+          before = ["local-fs.target"];
 
           serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
             ExecStart = ["" "${qubes-core-agent-linux}/lib/qubes/init/resize-rootfs-if-needed.sh"];
           };
         };
