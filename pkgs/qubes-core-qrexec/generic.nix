@@ -58,7 +58,7 @@ resholve.mkDerivation rec {
     mv $out/usr/lib/qubes $out/lib/qubes
     mv $out/usr/share $out/share
 
-    substituteInPlace "$out/etc/xdg/autostart/qrexec-policy-agent.desktop" --replace '/usr/lib/qubes/qrexec-policy-agent-autostart' "$out/lib/qubes/qrexec-policy-agent-autostart"
+    substituteInPlace "$out/etc/xdg/autostart/qrexec-policy-agent.desktop" --replace-fail '/usr/lib/qubes/qrexec-policy-agent-autostart' "$out/lib/qubes/qrexec-policy-agent-autostart"
 
     rm -rf $out/usr
   '';

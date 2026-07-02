@@ -54,7 +54,7 @@
       ]);
 
     postPatch = ''
-      substituteInPlace qmemman/Makefile --replace '_XENSTORE_H=$(shell ls /usr/include/xenstore.h)' '_XENSTORE_H=1'
+      substituteInPlace qmemman/Makefile --replace-fail '_XENSTORE_H=$(shell ls /usr/include/xenstore.h)' '_XENSTORE_H=1'
     '';
 
     buildPhase = ''
@@ -119,8 +119,8 @@ in
 
     installPhase = ''
       cp -R $src $out
-      substituteInPlace "$out/lib/udev/rules.d/99-qubes-usb.rules" --replace '/usr/lib/qubes/' "${resholved}/lib/qubes/"
-      substituteInPlace "$out/lib/udev/rules.d/99-qubes-block.rules" --replace '/usr/lib/qubes/' "${resholved}/lib/qubes/"
+      substituteInPlace "$out/lib/udev/rules.d/99-qubes-usb.rules" --replace-fail '/usr/lib/qubes/' "${resholved}/lib/qubes/"
+      substituteInPlace "$out/lib/udev/rules.d/99-qubes-block.rules" --replace-fail '/usr/lib/qubes/' "${resholved}/lib/qubes/"
     '';
 
     meta = resholved.meta;

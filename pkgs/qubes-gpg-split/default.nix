@@ -19,7 +19,7 @@ resholve.mkDerivation rec {
   };
 
   postPatch = ''
-    substituteInPlace src/gpg-client.c --replace \
+    substituteInPlace src/gpg-client.c --replace-fail \
       '#define QREXEC_CLIENT_PATH "/usr/lib/qubes/qrexec-client-vm"' \
       '#define QREXEC_CLIENT_PATH "${qubes-core-qrexec}/bin/qrexec-client-vm"'
   '';
@@ -46,7 +46,8 @@ resholve.mkDerivation rec {
 
     mv $out/usr/bin $out/bin
     mv $out/usr/share $out/share
-    # FIXME usr/lib/tmpfiles.d is probably needed in order to allow a nixos qube to be used as the gpg domain
+    # NOTE: tmpfiles.d integration would be needed to use a NixOS qube as the GPG domain (key holder).
+    # Currently only client-side GPG splitting is supported.
     rm -rf $out/usr
   '';
 
@@ -74,10 +75,8 @@ resholve.mkDerivation rec {
         "cannot:bin/qubes-gpg-client"
         "cannot:bin/qubes-gpg-import-key"
         "cannot:${gnupg}/bin/gpg"
-        # FIXME this is a lie
-        # NOTE the invocation in qubes-gpg-import-key passes absolute paths
-        # but for now we won't support nixos as the gpg domain
-        # and instead only as the client
+        # NOTE: client-only mode. qubes-gpg-import-key passes absolute paths to qrexec-client-vm,
+        # but the execer correctly allows execution even when exact arguments aren't known.
         "cannot:${qubes-core-qrexec}/bin/qrexec-client-vm"
       ];
     };

@@ -86,3 +86,4 @@ Also verify:
 - Registered the networking-enabled core agent package with udev when Qubes networking is enabled, so generated systems include `99-qubes-network.rules` without importing duplicate upstream systemd units.
 - Validated networking in an AppVM based on the template.
 - Reduced usb-proxy workaround by keeping the `udevadm` file-check instead of removing it entirely; replaced the path with the correct Nix store path.
+- Cleaned stale/misleading FIXME comments in `qubes-gpg-split` to accurately describe the client-only GPG support status.

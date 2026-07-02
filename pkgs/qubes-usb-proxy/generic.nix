@@ -43,18 +43,18 @@ resholve.mkDerivation rec {
     # overwrite the broken symlink created by make install-vm
     ln -sf ../../../lib/qubes/usb-detach-all "$out/etc/qubes/suspend-pre.d/usb-detach-all.sh"
 
-    substituteInPlace "$out/lib/qubes/usb-reset" --replace "#!/usr/bin/python3" "#!${python3}/bin/python3"
+    substituteInPlace "$out/lib/qubes/usb-reset" --replace-fail "#!/usr/bin/python3" "#!${python3}/bin/python3"
 
     # keep the file-check but use the correct path since resholve doesn't resolve string args to [
-    substituteInPlace "$out/lib/qubes/usb-import" --replace '/usr/bin/udevadm' '${systemd}/bin/udevadm'
+    substituteInPlace "$out/lib/qubes/usb-import" --replace-fail '/usr/bin/udevadm' '${systemd}/bin/udevadm'
 
     # sudo isn't handled by resholve. ideally we'd just do a single substituteInPlace for sudo here
     # but the keep statement would result in usb-export being left unresolved. we can hack around this
     # by turning it into a variable and adding an explicit fix resolution
-    substituteInPlace "$out/etc/qubes-rpc/qubes.USB" --replace "sudo" "/run/wrappers/bin/sudo" \
-      --replace "/usr/lib/qubes/usb-export" "\$QUBES_USB_EXPORT"
+    substituteInPlace "$out/etc/qubes-rpc/qubes.USB" --replace-fail "sudo" "/run/wrappers/bin/sudo" \
+      --replace-fail "/usr/lib/qubes/usb-export" "\$QUBES_USB_EXPORT"
 
-    substituteInPlace "$out/etc/qubes-rpc/qubes.USBAttach" --replace "/usr/lib/qubes/usb-import" "\$QUBES_USB_IMPORT"
+    substituteInPlace "$out/etc/qubes-rpc/qubes.USBAttach" --replace-fail "/usr/lib/qubes/usb-import" "\$QUBES_USB_IMPORT"
 
     rm -rf $out/usr
   '';

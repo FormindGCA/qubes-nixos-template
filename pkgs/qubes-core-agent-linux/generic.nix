@@ -225,42 +225,42 @@ in
         install -m 0644 "filesystem/30_cron.conf" "$out/lib/qubes-bind-dirs.d/30_cron.conf"
 
         # nixos does not have /etc/skel, initialize_home() requires it
-        substituteInPlace "$out/lib/qubes/init/functions" --replace "/etc/skel" "/var/empty"
+        substituteInPlace "$out/lib/qubes/init/functions" --replace-fail "/etc/skel" "/var/empty"
 
         # Fixup paths
-        substituteInPlace "$out/bin/qubes-session-autostart" --replace "QUBES_XDG_CONFIG_DROPINS = '/etc/qubes/autostart'" "QUBES_XDG_CONFIG_DROPINS = \"$out/etc/qubes/autostart\""
+        substituteInPlace "$out/bin/qubes-session-autostart" --replace-fail "QUBES_XDG_CONFIG_DROPINS = '/etc/qubes/autostart'" "QUBES_XDG_CONFIG_DROPINS = \"$out/etc/qubes/autostart\""
 
         substituteInPlace "$out/lib/qubes/qubes-trigger-sync-appmenus.sh" \
-          --replace '. /usr/lib/qubes/init/functions' ". $out/lib/qubes/init/functions" \
-          --replace '/usr/lib/qubes/qrexec-client-vm' "${qubes-core-qrexec}/lib/qubes/qrexec-client-vm"
+          --replace-fail '. /usr/lib/qubes/init/functions' ". $out/lib/qubes/init/functions" \
+          --replace-fail '/usr/lib/qubes/qrexec-client-vm' "${qubes-core-qrexec}/lib/qubes/qrexec-client-vm"
         substituteInPlace "$out/etc/qubes/post-install.d/10-qubes-core-agent-appmenus.sh" \
-          --replace '/usr/lib/qubes/qubes-trigger-sync-appmenus.sh' "$out/lib/qubes/qubes-trigger-sync-appmenus.sh"
+          --replace-fail '/usr/lib/qubes/qubes-trigger-sync-appmenus.sh' "$out/lib/qubes/qubes-trigger-sync-appmenus.sh"
 
         # we lied about qrexec-client-vm not execing :)
-        substituteInPlace "$out/bin/qvm-copy" --replace "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
-        substituteInPlace "$out/bin/qvm-copy-to-vm" --replace "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
-        substituteInPlace "$out/bin/qvm-move" --replace "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
-        substituteInPlace "$out/bin/qvm-move-to-vm" --replace "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
+        substituteInPlace "$out/bin/qvm-copy" --replace-fail "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
+        substituteInPlace "$out/bin/qvm-copy-to-vm" --replace-fail "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
+        substituteInPlace "$out/bin/qvm-move" --replace-fail "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
+        substituteInPlace "$out/bin/qvm-move-to-vm" --replace-fail "/usr/lib/qubes/qfile-agent" "$out/lib/qubes/qfile-agent"
         
         # patching qvm-open-in-dvm
-        substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/bin/sh -c" "${bash}/bin/sh -c"
-        substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/lib/qubes/qopen-in-vm" "$out/lib/qubes/qopen-in-vm"
-        substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/lib/qubes/qrexec-client-vm" "${qubes-core-qrexec}/lib/qubes/qrexec-client-vm"
+        substituteInPlace "$out/bin/qvm-open-in-dvm" --replace-fail "/bin/sh -c" "${bash}/bin/sh -c"
+        substituteInPlace "$out/bin/qvm-open-in-dvm" --replace-fail "/usr/lib/qubes/qopen-in-vm" "$out/lib/qubes/qopen-in-vm"
+        substituteInPlace "$out/bin/qvm-open-in-dvm" --replace-fail "/usr/lib/qubes/qrexec-client-vm" "${qubes-core-qrexec}/lib/qubes/qrexec-client-vm"
         
         # patching qvm-run-vm
-        substituteInPlace "$out/bin/qvm-run-vm" --replace "/usr/lib/qubes/qrun-in-vm" "$out/lib/qubes/qrun-in-vm"
-        substituteInPlace "$out/bin/qvm-run-vm" --replace "/usr/lib/qubes/qrexec-client-vm" "${qubes-core-qrexec}/lib/qubes/qrexec-client-vm"
+        substituteInPlace "$out/bin/qvm-run-vm" --replace-fail "/usr/lib/qubes/qrun-in-vm" "$out/lib/qubes/qrun-in-vm"
+        substituteInPlace "$out/bin/qvm-run-vm" --replace-fail "/usr/lib/qubes/qrexec-client-vm" "${qubes-core-qrexec}/lib/qubes/qrexec-client-vm"
 
         # first instance is an absolute path check, we could also just hardcode this to true
-        substituteInPlace "$out/bin/qvm-open-in-dvm" --replace "/usr/bin/zenity" "${zenity}/bin/zenity"
+        substituteInPlace "$out/bin/qvm-open-in-dvm" --replace-fail "/usr/bin/zenity" "${zenity}/bin/zenity"
 
         # use suid wrapper we will create in the module
-        substituteInPlace "$out/etc/qubes-rpc/qubes.Filecopy" --replace "/usr/lib/qubes/qfile-unpacker" "/run/wrappers/bin/qfile-unpacker"
+        substituteInPlace "$out/etc/qubes-rpc/qubes.Filecopy" --replace-fail "/usr/lib/qubes/qfile-unpacker" "/run/wrappers/bin/qfile-unpacker"
 
         # Patch Python shebangs under etc/qubes-rpc for NixOS
-        substituteInPlace "$out/etc/qubes-rpc/qubes.StartApp" --replace '#!/usr/bin/python3' "#!${python3}/bin/python3"
+        substituteInPlace "$out/etc/qubes-rpc/qubes.StartApp" --replace-fail '#!/usr/bin/python3' "#!${python3}/bin/python3"
         substituteInPlace "$out/etc/qubes-rpc/qubes.GetImageRGBA" \
-          --replace '/usr/lib/qubes/xdg-icon' "$out/lib/qubes/xdg-icon" \
+          --replace-fail '/usr/lib/qubes/xdg-icon' "$out/lib/qubes/xdg-icon" \
           --replace-fail 'ICON_MAXSIZE=512' 'ICON_MAXSIZE=128'
         substituteInPlace "$out/lib/qubes/xdg-icon" \
           --replace-fail 'themes = themes + sorted([d for d in os.listdir("/usr/share/icons") if d not in themes and os.path.isdir("/usr/share/icons/" + d)])' \
@@ -270,10 +270,10 @@ in
           $'    if command[0] == b\'/usr/bin/python3\':\n        command[0] = b\'${python3}/bin/python3\'\n    elif command[0].endswith(b\'.py\'):\n        command = [b\'${python3}/bin/python3\'] + command\n    try:\n        os.execvp(command[0], command)\n    except FileNotFoundError:\n        print(\'VMExec command not found: {}\'.format([part.decode(\'utf-8\', \'replace\') for part in command]), file=sys.stderr)\n        raise'
 
         for path in ${lib.concatStringsSep " " scripts_using_functions}; do
-          substituteInPlace "$out/$path" --replace '/usr/lib/qubes/init/functions' "functions"
+          substituteInPlace "$out/$path" --replace-fail '/usr/lib/qubes/init/functions' "functions"
         done
 
-        substituteInPlace "$out/lib/qubes/init/bind-dirs.sh" --replace \
+        substituteInPlace "$out/lib/qubes/init/bind-dirs.sh" --replace-fail \
           "for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do" \
           "for source_folder in $out/lib/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do"
 
@@ -320,7 +320,7 @@ in
         ln -sf ../../lib/qubes/qubes-setup-dnat-to-ns $out/etc/dhclient.d/qubes-setup-dnat-to-ns.sh
 
         for path in lib/qubes/init/network-uplink-wait.sh lib/qubes/setup-ip lib/qubes/update-proxy-configs ; do
-          substituteInPlace "$out/$path" --replace '/usr/lib/qubes/init/functions' "functions"
+          substituteInPlace "$out/$path" --replace-fail '/usr/lib/qubes/init/functions' "functions"
         done
 
         cat >> "$out/lib/qubes/update-proxy-configs" <<EOT
@@ -346,7 +346,7 @@ in
         fi
         EOT
 
-        substituteInPlace "$out/etc/udev/rules.d/99-qubes-network.rules" --replace '/usr/bin/systemctl' '${systemd}/bin/systemctl'
+        substituteInPlace "$out/etc/udev/rules.d/99-qubes-network.rules" --replace-fail '/usr/bin/systemctl' '${systemd}/bin/systemctl'
 
         mv "$out/etc/udev/rules.d/99-qubes-network.rules" "$out/lib/udev/rules.d/"
       '';
