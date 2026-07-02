@@ -21,6 +21,12 @@
   # Don't use the GRUB 2 boot loader since it conflicts with initScript.enable
   boot.loader.grub.enable = false;
 
-  # Workaround a module loading issue on boot by using the legacy stage2
-  boot.initrd.systemd.enable = false;
+  boot.initrd.systemd.enable = true;
+  boot.initrd.availableKernelModules = [
+    "xen-blkfront"
+    "xen-evtchn"
+    "xen-gntalloc"
+    "xen-gntdev"
+    "xen-netfront"
+  ];
 }
