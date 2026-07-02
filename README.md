@@ -68,6 +68,8 @@ When using Qubes OS Updater on a cloned or renamed template, set `services.qubes
 services.qubes.updates.flakeConfiguration = "nixos";
 ```
 
+By default the updater refreshes the `nixpkgs` and `qubes-nixos-template` flake inputs before checking and applying updates. Override `services.qubes.updates.updateInputs` to change that list, or set it to `[]` to use the existing lock file unchanged.
+
 ## alternative install via iso
 
 for those that want to avoid installing anything in dom0, these instructions will allow you to install to

@@ -22,12 +22,7 @@ with lib; {
     };
     flags = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [
-        "--update-input"
-        "nixpkgs"
-        "--update-input"
-        "qubes-nixos-template"
-      ];
+      default = [];
       example = [
         "-I"
         "stuff=/home/alice/nixos-stuff"
@@ -37,10 +32,17 @@ with lib; {
       ];
       description = ''
         Any additional flags passed to {command}`nixos-rebuild`, used for both the check and actual update.
-
-        If you are using flakes and use a local repo you can add
-        {command}`[ "--update-input" "nixpkgs" "--commit-lock-file" ]`
-        to update nixpkgs.
+      '';
+    };
+    updateInputs = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [
+        "nixpkgs"
+        "qubes-nixos-template"
+      ];
+      description = ''
+        Flake inputs updated before checking for and applying updates.
+        Set to an empty list to use the existing lock file unchanged.
       '';
     };
     extraPackages = lib.mkOption {
@@ -87,6 +89,9 @@ with lib; {
 
           cp -r ${lib.escapeShellArg cfg.configurationDirectory}/. "$tempdir"
           cd "$tempdir"
+          ${lib.optionalString (cfg.updateInputs != []) ''
+            ${config.nix.package.out}/bin/nix flake update ${lib.escapeShellArgs cfg.updateInputs} 1>&2
+          ''}
           ${
             if cfg.flakeConfiguration == null
             then ''flakeConfig="$(${pkgs.nettools}/bin/hostname)"''
@@ -120,6 +125,11 @@ with lib; {
             else ''flakeConfig=${lib.escapeShellArg cfg.flakeConfiguration}''
           }
           flakeTarget=${lib.escapeShellArg cfg.configurationDirectory}#$flakeConfig
+
+          ${lib.optionalString (cfg.updateInputs != []) ''
+            cd ${lib.escapeShellArg cfg.configurationDirectory}
+            ${config.nix.package.out}/bin/nix flake update ${lib.escapeShellArgs cfg.updateInputs}
+          ''}
 
           # by default switch to the new generation, updating the system
           if [ $# -eq 0 ]; then

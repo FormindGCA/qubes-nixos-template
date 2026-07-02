@@ -22,8 +22,8 @@ Stabilize the Qubes/NixOS integration before doing larger cleanups. Prefer small
 
 ## Next Milestone: Split Core Agent Package Roles
 
-1. Re-test Qubes Updater / `qubes.VMExec` in a real template VM.
-2. Re-test networking in an AppVM based on the template.
+1. Re-test networking in an AppVM based on the template.
+2. Investigate the remaining `system` renamed warning.
 
 ## Validation For Package Role Refactor
 
@@ -73,3 +73,5 @@ Also verify:
 - Made `qubes.VMExec` run updater-injected `.py` commands with the Nix Python and exposed `/usr/lib/qubes/upgrades-status-notify`.
 - Intercepted Qubes Updater's injected agent entrypoint and redirected it to `qubes-nixos-rebuild`.
 - Made `qubes-nixos-rebuild` pass `--flake <configurationDirectory>#<flakeConfiguration>` instead of relying on the VM hostname.
+- Validated Qubes Updater / `qubes.VMExec` in a real template VM.
+- Replaced deprecated default `--update-input` flags with `services.qubes.updates.updateInputs` and `nix flake update`.
