@@ -360,6 +360,8 @@ in
             # guarded by check for /sys/fs/selinux
             ["chcon" "restorecon"]
             # guarded by check for
+            # called by misc-post.sh (at runtime, from glibc)
+            ++ ["ldconfig"]
             ++ ["kdialog"]
             ++ lib.optional (!enableNetworking) "ip";
         };
