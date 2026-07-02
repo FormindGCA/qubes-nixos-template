@@ -268,8 +268,8 @@ in
         done
 
         substituteInPlace "$out/lib/qubes/init/bind-dirs.sh" --replace-fail \
-          "for source_folder in /usr/lib/qubes-bind-dirs.d /etc/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do" \
-          "for source_folder in $out/lib/qubes-bind-dirs.d /rw/config/qubes-bind-dirs.d ; do"
+          'sources=( "/usr/lib/qubes-bind-dirs.d" "/etc/qubes-bind-dirs.d" )' \
+          "sources=( \"$out/lib/qubes-bind-dirs.d\" )"
 
         substituteInPlace "$out/lib/qubes/init/resize-rootfs-if-needed.sh" \
           --replace-fail '/usr/lib/qubes/resize-rootfs' "$out/lib/qubes/resize-rootfs"
