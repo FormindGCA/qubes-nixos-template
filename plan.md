@@ -80,4 +80,4 @@ Also verify:
 - Cleaned `qubes-linux-utils` by replacing the `lib.extendDerivation` workaround with an explicit wrapper derivation that preserves the post-resholve udev rule fixups.
 - Removed stale packaging comments from core qrexec, core agent, and GUI agent expressions.
 - Implemented the NixOS side of application menu export by exposing `/etc/qubes`, fixing appmenu sync script paths, and wrapping `qubes.GetAppmenus` with the required PATH.
-- Patched appmenu icon export so `qubes.GetImageRGBA` calls the packaged `xdg-icon`, and `xdg-icon` discovers icon themes through `XDG_DATA_DIRS` instead of requiring `/usr/share/icons` to exist.
+- Patched appmenu icon export so `qubes.GetImageRGBA` calls the packaged `xdg-icon`, has explicit image conversion tools in `PATH`, limits generated icons to 128px, and `xdg-icon` discovers icon themes through `XDG_DATA_DIRS` instead of requiring `/usr/share/icons` to exist.
