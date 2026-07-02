@@ -259,7 +259,7 @@ in
         substituteInPlace "$out/lib/qubes/xdg-icon" \
           --replace-fail 'themes = themes + sorted([d for d in os.listdir("/usr/share/icons") if d not in themes and os.path.isdir("/usr/share/icons/" + d)])' \
           $'icon_dirs = []\nfor data_dir in os.environ.get("XDG_DATA_DIRS", "/usr/local/share:/usr/share").split(":"):\n    icons_dir = os.path.join(data_dir, "icons")\n    if os.path.isdir(icons_dir):\n        icon_dirs.append(icons_dir)\nthemes = themes + sorted({d for icons_dir in icon_dirs for d in os.listdir(icons_dir) if d not in themes and os.path.isdir(os.path.join(icons_dir, d))})'
-        substituteInPlace "$out/lib/python3.13/site-packages/qubesagent/vmexec.py" \
+        substituteInPlace "$out/lib/${python3.libPrefix}/site-packages/qubesagent/vmexec.py" \
           --replace-fail '    os.execvp(command[0], command)' \
           $'    if command[0] == b\'/usr/bin/python3\':\n        command[0] = b\'${python3}/bin/python3\'\n    elif command[0].endswith(b\'.py\'):\n        command = [b\'${python3}/bin/python3\'] + command\n    try:\n        os.execvp(command[0], command)\n    except FileNotFoundError:\n        print(\'VMExec command not found: {}\'.format([part.decode(\'utf-8\', \'replace\') for part in command]), file=sys.stderr)\n        raise'
 
@@ -402,7 +402,6 @@ in
             lvm2
             mount
             nettools
-            networkmanager
             parted
             procps
             psmisc
@@ -413,7 +412,7 @@ in
             util-linux
             zenity
           ]
-          ++ lib.optional enableNetworking iproute2;
+          ++ lib.optionals enableNetworking [networkmanager iproute2];
         keep = {
           source = ["$file_name"];
           "$rc" = true;
@@ -431,7 +430,6 @@ in
             "cannot:${e2fsprogs}/bin/mkfs.ext4"
             "cannot:${kmod}/bin/modprobe"
             "cannot:${lib.getBin lvm2}/bin/dmsetup"
-            "cannot:${networkmanager}/bin/nmcli"
             "cannot:${systemd}/bin/systemctl"
             "cannot:${systemd}/bin/udevadm"
             "cannot:bin/qubes-vmexec"
@@ -440,7 +438,7 @@ in
             "cannot:${qubes-core-qrexec}/lib/qubes/qrexec-client-vm"
             "cannot:${zenity}/bin/zenity"
           ]
-          ++ lib.optional enableNetworking "cannot:${iproute2}/bin/ip";
+          ++ lib.optionals enableNetworking ["cannot:${networkmanager}/bin/nmcli" "cannot:${iproute2}/bin/ip"];
       };
     };
 
