@@ -304,13 +304,14 @@ if [ "$(cat "$sysfs_xvda/size")" -lt \
    exit 0
 fi
 
-resize-rootfs
+timeout 30 resize-rootfs || { echo "resize-rootfs failed, skipping resize" >&2; exit 0; }
 RESIZE_SCRIPT
         # resholve resolves commands called directly, but not args to other
         # commands like timeout(1) — substitute store paths manually
         substituteInPlace "$out/lib/qubes/init/resize-rootfs-if-needed.sh" \
           --replace-fail 'timeout 5 blockdev' "timeout 5 ${util-linux}/bin/blockdev" \
-          --replace-fail 'timeout 10 dumpe2fs' "timeout 10 ${e2fsprogs}/bin/dumpe2fs"
+          --replace-fail 'timeout 10 dumpe2fs' "timeout 10 ${e2fsprogs}/bin/dumpe2fs" \
+          --replace-fail 'timeout 30 resize-rootfs' "timeout 30 $out/lib/qubes/resize-rootfs"
 
         # remove the default VMExec definition since we need to modify it's PATH based on user args in the updates module
         rm "$out/etc/qubes-rpc/qubes.VMExec"
@@ -461,6 +462,9 @@ RESIZE_SCRIPT
           # allow the dynamic commands used in mount-dirs.sh
           "$mount_home" = true;
           "$mount_usr_local" = true;
+
+          # explicit path arg to timeout(1) in resize-rootfs-if-needed.sh
+          "${placeholder "out"}/lib/qubes/resize-rootfs" = true;
         };
         execer =
           [
