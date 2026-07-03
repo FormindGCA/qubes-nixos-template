@@ -274,20 +274,43 @@ in
         substituteInPlace "$out/lib/qubes/init/resize-rootfs-if-needed.sh" \
           --replace-fail '/usr/lib/qubes/resize-rootfs' 'resize-rootfs'
 
-        # add device checks and timeouts to prevent hangs during early boot
-        cat > /tmp/patch-resize.sed << 'SEDEOF'
-/^set -e$/a\
-[ -b /dev/xvda ] || { echo "xvda not found, skipping resize" >&2; exit 0; }\
+        # replace with a version that has device checks and timeouts on blocking commands
+        cat > "$out/lib/qubes/init/resize-rootfs-if-needed.sh" << 'RESIZE_SCRIPT'
+#!/bin/sh
+
+set -e
+
+[ -b /dev/xvda ] || { echo "xvda not found, skipping resize" >&2; exit 0; }
 [ -b /dev/mapper/dmroot ] || { echo "dmroot not found, skipping resize" >&2; exit 0; }
 
-s@^if \[ "\$(blockdev --getro /dev/xvda)" -eq "1" \]; then$@blockdev_tmp=$(timeout 5 blockdev --getro /dev/xvda) || { echo "blockdev failed, skipping resize" >\&2; exit 0; }\nif [ "$blockdev_tmp" -eq "1" ]; then@
+ro=$(timeout 5 blockdev --getro /dev/xvda) || { echo "blockdev failed, skipping resize" >&2; exit 0; }
+if [ "$ro" -eq "1" ]; then
+    echo "xvda is read-only, not resizing" >&2
+    exit 0
+fi
 
-/^    ext4_block_count=\$(dumpe2fs/,/^    ext4_block_size=\$(dumpe2fs)/c\
-    dumpe2fs_output=$(timeout 10 dumpe2fs /dev/mapper/dmroot) || { echo "dumpe2fs failed, skipping resize" >&2; exit 0; }\
-    ext4_block_count=$(echo "$dumpe2fs_output" | grep '^Block count:' | sed -E 's/Block count:[[:space:]]+//')\
-    ext4_block_size=$(echo "$dumpe2fs_output" | grep '^Block size:' | sed -E 's/Block size:[[:space:]]+//')
-SEDEOF
-        sed -i -f /tmp/patch-resize.sed "$out/lib/qubes/init/resize-rootfs-if-needed.sh"
+sysfs_xvda="/sys/class/block/xvda"
+
+boot_data_size=$((203 * 2 * 1024))
+
+dumpe2fs_output=$(timeout 10 dumpe2fs /dev/mapper/dmroot) || { echo "dumpe2fs failed, skipping resize" >&2; exit 0; }
+ext4_block_count=$(echo "$dumpe2fs_output" | grep '^Block count:' | sed -E 's/Block count:[[:space:]]+//')
+ext4_block_size=$(echo "$dumpe2fs_output" | grep '^Block size:' | sed -E 's/Block size:[[:space:]]+//')
+rootfs_size=$((ext4_block_count * ext4_block_size / 512))
+size_margin=$((5 * 1024 * 2))
+if [ "$(cat "$sysfs_xvda/size")" -lt \
+       $(( rootfs_size + boot_data_size + size_margin )) ]; then
+   echo "root filesystem already at $rootfs_size blocks" >&2
+   exit 0
+fi
+
+resize-rootfs
+RESIZE_SCRIPT
+        # resholve resolves commands called directly, but not args to other
+        # commands like timeout(1) — substitute store paths manually
+        substituteInPlace "$out/lib/qubes/init/resize-rootfs-if-needed.sh" \
+          --replace-fail 'timeout 5 blockdev' "timeout 5 ${util-linux}/bin/blockdev" \
+          --replace-fail 'timeout 10 dumpe2fs' "timeout 10 ${e2fsprogs}/bin/dumpe2fs"
 
         # remove the default VMExec definition since we need to modify it's PATH based on user args in the updates module
         rm "$out/etc/qubes-rpc/qubes.VMExec"
