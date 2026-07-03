@@ -470,8 +470,11 @@ RESIZE_SCRIPT
           [
             "cannot:${e2fsprogs}/bin/fsck.ext4"
             "cannot:${e2fsprogs}/bin/mkfs.ext4"
+            "cannot:${e2fsprogs}/bin/resize2fs"
             "cannot:${coreutils}/bin/timeout"
+            "cannot:${parted}/bin/partprobe"
             "cannot:${util-linux}/bin/blockdev"
+            "cannot:${util-linux}/bin/sfdisk"
             "cannot:${kmod}/bin/modprobe"
             "cannot:${lib.getBin lvm2}/bin/dmsetup"
             "cannot:${systemd}/bin/systemctl"
