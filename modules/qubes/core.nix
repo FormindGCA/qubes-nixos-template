@@ -162,10 +162,11 @@ in
             fsType = "ext4";
           };
           "/proc/xen" = {
-            device = "xen";
+            device = "xenfs";
             fsType = "xenfs";
             noCheck = true;
             options = [
+              "nofail"
               "x-systemd.after=systemd-modules-load.service"
               "x-systemd.requires=systemd-modules-load.service"
             ];
