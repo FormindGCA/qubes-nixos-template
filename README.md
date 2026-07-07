@@ -148,6 +148,5 @@ Host github.com
 - memory resizing seems to cause crashes in ff
 
 ### todo
-- deal with substituteInPlace deprecation
-- clean up package fixups and resholve configuration
+- continue cleaning package fixups and resholve configuration
 - keep the legacy scripted initrd as the default until a systemd initrd migration is validated in a real TemplateVM

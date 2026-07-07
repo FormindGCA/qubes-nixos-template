@@ -63,6 +63,9 @@ Also verify:
 
 ## Recently Completed
 
+- Aligned Qubes 4.3 documentation, RPM metadata, and update helper defaults.
+- Replaced remaining deprecated `substituteInPlace --replace` calls with `--replace-fail`.
+- Cleaned package wrapper `rev` forwarding and made `build.sh` accept an explicit build target.
 - Fixed `qubes-gui-agent-linux` build dependencies and systemd user unit relocation.
 - Added Docker build workflow documentation.
 - Added `system.stateVersion` to the example config.

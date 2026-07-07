@@ -3,9 +3,9 @@
 set -ex
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE}")" &>/dev/null && pwd)"
 
-qubesVersion="${1:-${QUBES_VERSION:-4.2}}"
+qubesVersion="${1:-${QUBES_VERSION:-4.3}}"
 qubesVersionRegex="${qubesVersion//./\.}"
-usbProxyMajorVersion="${USB_PROXY_MAJOR_VERSION:-1.3}"
+usbProxyMajorVersion="${USB_PROXY_MAJOR_VERSION:-${qubesVersion}}"
 
 update_packages() {
   local version_regex="$1"
@@ -39,10 +39,10 @@ update_packages "v(${qubesVersionRegex}\.[0-9.]+)" ".src" \
 update_packages "v(${qubesVersionRegex}\.[0-9.]+)" ".src.src" \
   "pkgs/qubes-linux-utils"
 
-# this is an odd case as 1.3 is the release line for 4.2; set USB_PROXY_MAJOR_VERSION if 4.3 uses a different branch line
+# set USB_PROXY_MAJOR_VERSION if usb-proxy uses a different branch line than the Qubes release
 update_packages "v(${usbProxyMajorVersion}\.[0-9.]+)" ".src" \
   "pkgs/qubes-usb-proxy"
 
-# these packages should work for both 4.2 and 4.3
+# these packages should work across supported Qubes release lines
 update_packages "v([0-9.]+)" ".src" \
   "pkgs/qubes-gpg-split" \
