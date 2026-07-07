@@ -221,7 +221,7 @@ in
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
-            TimeoutSec = 120;
+            TimeoutSec = 10;
             ExecStart = ["" "${qubes-core-agent-linux}/lib/qubes/init/resize-rootfs-if-needed.sh"];
           };
         };

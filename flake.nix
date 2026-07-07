@@ -32,7 +32,7 @@
         prev.nix-update
         .overrideAttrs
         (finalAttrs: previousAttrs: {
-          patches = [./pkgs/nix-update/0000-fetch-from-tags.patch];
+          patches = [./patches/nix-update/0000-fetch-from-tags.patch];
         });
     };
 
