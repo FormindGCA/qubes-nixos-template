@@ -9,16 +9,15 @@
   rev ? null,
 }:
 let
-  qubesLib = import ../lib.nix {inherit lib;};
+  qubesLib = import ../lib.nix {inherit lib fetchFromGitHub;};
 in
 resholve.mkDerivation rec {
   pname = "qubes-gpg-split";
   version = "2.0.84";
 
-  src = fetchFromGitHub {
-    owner = "QubesOS";
+  src = qubesLib.fetchFromQubes {
     repo = "qubes-app-linux-split-gpg";
-    rev = if rev != null then rev else "v${version}";
+    inherit version rev;
     hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
   };
 

@@ -50,18 +50,13 @@
   rev ? null,
 }:
 let
-  qubesLib = import ../lib.nix {inherit lib;};
+  qubesLib = import ../lib.nix {inherit lib fetchFromGitHub;};
 in
 resholve.mkDerivation rec {
   pname = "qubes-gui-agent-linux";
   inherit version;
 
-  src = fetchFromGitHub {
-    owner = "QubesOS";
-    repo = pname;
-    rev = if rev != null then rev else "v${version}";
-    inherit hash;
-  };
+  src = qubesLib.fetchFromQubes {repo = pname; inherit version hash rev;};
 
   nativeBuildInputs =
     [

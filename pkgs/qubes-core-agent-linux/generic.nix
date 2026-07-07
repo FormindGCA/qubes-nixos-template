@@ -56,7 +56,7 @@
   hash,
   rev ? null,
 }: let
-  qubesLib = import ../lib.nix {inherit lib;};
+  qubesLib = import ../lib.nix {inherit lib fetchFromGitHub;};
 
   scripts_using_functions = [
     "lib/qubes/init/qubes-early-vm-config.sh"
@@ -82,12 +82,7 @@
       #"bin/qvm-run-vm"
     ];
 
-    src = fetchFromGitHub {
-      owner = "QubesOS";
-      repo = "qubes-core-agent-linux";
-      rev = if rev != null then rev else "v${version}";
-      inherit hash;
-    };
+    src = qubesLib.fetchFromQubes {repo = "qubes-core-agent-linux"; inherit version hash rev;};
 
     qubesagent = python3Packages.buildPythonPackage {
       pname = "qubesagent";

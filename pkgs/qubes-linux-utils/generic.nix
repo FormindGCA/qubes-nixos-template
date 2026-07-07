@@ -18,18 +18,13 @@
   hash,
   rev ? null,
 }: let
-  qubesLib = import ../lib.nix {inherit lib;};
+  qubesLib = import ../lib.nix {inherit lib fetchFromGitHub;};
   name = "qubes-linux-utils";
   resholved = resholve.mkDerivation rec {
     inherit version;
     pname = "${name}-resholved";
 
-    src = fetchFromGitHub {
-      owner = "QubesOS";
-      repo = name;
-      rev = if rev != null then rev else "v${version}";
-      inherit hash;
-    };
+    src = qubesLib.fetchFromQubes {repo = name; inherit version hash rev;};
 
     nativeBuildInputs =
       [
