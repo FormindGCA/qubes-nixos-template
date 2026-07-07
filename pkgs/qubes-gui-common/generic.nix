@@ -6,6 +6,9 @@
   hash,
   rev ? null,
 }:
+let
+  qubesLib = import ../lib.nix {inherit lib;};
+in
 stdenv.mkDerivation rec {
   pname = "qubes-gui-common";
   inherit version;
@@ -26,11 +29,5 @@ stdenv.mkDerivation rec {
     cp include/*.h $out/include/
   '';
 
-  meta = with lib; {
-    description = "Common files for Qubes GUI - protocol headers";
-    homepage = "https://qubes-os.org";
-    license = licenses.gpl2Plus;
-    maintainers = [];
-    platforms = platforms.linux;
-  };
+  meta = qubesLib.meta "Common files for Qubes GUI - protocol headers";
 }

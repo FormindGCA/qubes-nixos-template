@@ -18,6 +18,7 @@
   hash,
   rev ? null,
 }: let
+  qubesLib = import ../lib.nix {inherit lib;};
   name = "qubes-linux-utils";
   resholved = resholve.mkDerivation rec {
     inherit version;
@@ -100,13 +101,7 @@
       };
     };
 
-    meta = with lib; {
-      description = "Common Linux files for Qubes VM.";
-      homepage = "https://qubes-os.org";
-      license = licenses.gpl2Plus;
-      maintainers = [];
-      platforms = platforms.linux;
-    };
+    meta = qubesLib.meta "Common Linux files for Qubes VM.";
   };
 in
   stdenv.mkDerivation {

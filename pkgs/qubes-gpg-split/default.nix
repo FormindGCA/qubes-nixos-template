@@ -1,4 +1,5 @@
 {
+  lib,
   fetchFromGitHub,
   resholve,
   coreutils,
@@ -7,6 +8,9 @@
   pandoc,
   rev ? null,
 }:
+let
+  qubesLib = import ../lib.nix {inherit lib;};
+in
 resholve.mkDerivation rec {
   pname = "qubes-gpg-split";
   version = "2.0.84";
@@ -81,4 +85,6 @@ resholve.mkDerivation rec {
       ];
     };
   };
+
+  meta = qubesLib.meta "Qubes service for splitting GnuPG private-key operations into a separate qube";
 }

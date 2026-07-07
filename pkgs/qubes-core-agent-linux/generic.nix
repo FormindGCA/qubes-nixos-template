@@ -56,6 +56,7 @@
   hash,
   rev ? null,
 }: let
+  qubesLib = import ../lib.nix {inherit lib;};
 
   scripts_using_functions = [
     "lib/qubes/init/qubes-early-vm-config.sh"
@@ -520,11 +521,5 @@ RESIZE_SCRIPT
         --prefix LD_LIBRARY_PATH : "$program_LIBRARY_PATH"
     '';
 
-    meta = with lib; {
-      description = "The Qubes core files for installation inside a Qubes VM";
-      homepage = "https://qubes-os.org";
-      license = licenses.gpl2Plus;
-      maintainers = [];
-      platforms = platforms.linux;
-    };
+    meta = qubesLib.meta "The Qubes core files for installation inside a Qubes VM";
   }

@@ -15,6 +15,9 @@
   hash,
   rev ? null,
 }:
+let
+  qubesLib = import ../lib.nix {inherit lib;};
+in
 resholve.mkDerivation rec {
   pname = "qubes-usb-proxy";
   inherit version;
@@ -107,11 +110,5 @@ resholve.mkDerivation rec {
     };
   };
 
-  meta = with lib; {
-    description = "The Qubes service for proxying USB devices";
-    homepage = "https://qubes-os.org";
-    license = licenses.gpl2Plus;
-    maintainers = [];
-    platforms = platforms.linux;
-  };
+  meta = qubesLib.meta "The Qubes service for proxying USB devices";
 }

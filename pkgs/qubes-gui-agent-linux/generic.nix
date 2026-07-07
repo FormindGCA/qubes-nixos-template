@@ -49,6 +49,9 @@
   hash,
   rev ? null,
 }:
+let
+  qubesLib = import ../lib.nix {inherit lib;};
+in
 resholve.mkDerivation rec {
   pname = "qubes-gui-agent-linux";
   inherit version;
@@ -252,11 +255,5 @@ resholve.mkDerivation rec {
 
   '';
 
-  meta = with lib; {
-    description = "The Qubes GUI Agent for AppVMs";
-    homepage = "https://qubes-os.org";
-    license = licenses.gpl2Plus;
-    maintainers = [];
-    platforms = platforms.linux;
-  };
+  meta = qubesLib.meta "The Qubes GUI Agent for AppVMs";
 }

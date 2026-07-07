@@ -14,6 +14,7 @@
   hash,
   rev ? null,
 }: let
+  qubesLib = import ../lib.nix {inherit lib;};
   qubesdb-cmds = "qubesdb-read qubesdb-write qubesdb-rm qubesdb-multiread qubesdb-list qubesdb-watch";
 in
   stdenv.mkDerivation rec {
@@ -62,11 +63,5 @@ in
       done
     '';
 
-    meta = with lib; {
-      description = "QubesDB libs and daemon service";
-      homepage = "https://qubes-os.org";
-      license = licenses.gpl2Plus;
-      maintainers = [];
-      platforms = platforms.linux;
-    };
+    meta = qubesLib.meta "QubesDB libs and daemon service";
   }

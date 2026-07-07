@@ -7,6 +7,9 @@
   hash,
   rev ? null,
 }:
+let
+  qubesLib = import ../lib.nix {inherit lib;};
+in
 stdenv.mkDerivation rec {
   pname = "qubes-core-vchan-xen";
   inherit version;
@@ -29,11 +32,5 @@ stdenv.mkDerivation rec {
 
   env.CFLAGS = "-DHAVE_XC_DOMAIN_GETINFO_SINGLE";
 
-  meta = with lib; {
-    description = "Libraries required for the higher-level Qubes daemons and tools";
-    homepage = "https://qubes-os.org";
-    license = licenses.gpl2Plus;
-    maintainers = [];
-    platforms = platforms.linux;
-  };
+  meta = qubesLib.meta "Libraries required for the higher-level Qubes daemons and tools";
 }

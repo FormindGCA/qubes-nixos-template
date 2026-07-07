@@ -17,6 +17,9 @@
   hash,
   rev ? null,
 }:
+let
+  qubesLib = import ../lib.nix {inherit lib;};
+in
 resholve.mkDerivation rec {
   pname = "qubes-core-qrexec";
   inherit version;
@@ -71,11 +74,5 @@ resholve.mkDerivation rec {
     };
   };
 
-  meta = with lib; {
-    description = "The Qubes qrexec files (qube side)";
-    homepage = "https://qubes-os.org";
-    license = licenses.gpl2Plus;
-    maintainers = [];
-    platforms = platforms.linux;
-  };
+  meta = qubesLib.meta "The Qubes qrexec files (qube side)";
 }
