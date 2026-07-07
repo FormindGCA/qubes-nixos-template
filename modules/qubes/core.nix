@@ -69,6 +69,7 @@ in
         services.qubes.db.enable = true;
 
         boot.initrd.kernelModules = ["xen_blkfront" "dm_mod" "dm_snapshot"];
+        boot.kernelModules = ["xenfs"];
 
         boot.initrd.services.udev.rules = ''
           SUBSYSTEM=="block", KERNEL=="xvda3", SYMLINK+="mapper/dmroot", ENV{SYSTEMD_ALIAS}+="/dev/mapper/dmroot"
@@ -164,6 +165,10 @@ in
             device = "xen";
             fsType = "xenfs";
             noCheck = true;
+            options = [
+              "x-systemd.after=systemd-modules-load.service"
+              "x-systemd.requires=systemd-modules-load.service"
+            ];
           };
           "/rw" = {
             device = "/dev/xvdb";
