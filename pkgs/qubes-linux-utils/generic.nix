@@ -19,12 +19,12 @@
   rev ? null,
 }: let
   qubesLib = import ../lib.nix {inherit lib fetchFromGitHub;};
-  name = "qubes-linux-utils";
+  basePname = "qubes-linux-utils";
   resholved = resholve.mkDerivation rec {
     inherit version;
-    pname = "${name}-resholved";
+    pname = "${basePname}-resholved";
 
-    src = qubesLib.fetchFromQubes {repo = name; inherit version hash rev;};
+    src = qubesLib.fetchFromQubes {repo = basePname; inherit version hash rev;};
 
     nativeBuildInputs =
       [
@@ -101,8 +101,8 @@
 in
   stdenv.mkDerivation {
     src = resholved;
+    pname = basePname;
     inherit version;
-    pname = name;
 
     dontConfigure = true;
     dontBuild = true;
