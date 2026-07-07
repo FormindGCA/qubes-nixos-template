@@ -21,7 +21,6 @@
   # Don't use the GRUB 2 boot loader since it conflicts with initScript.enable
   boot.loader.grub.enable = false;
 
-  # Workaround a module loading issue on boot by using the legacy stage2.
-  # systemd initrd builds, but currently prevents the TemplateVM from booting.
-  boot.initrd.systemd.enable = false;
+  # Required by NixOS 26.11; Qubes-specific dmroot setup is handled in the core module.
+  boot.initrd.systemd.enable = true;
 }
