@@ -419,7 +419,6 @@ RESIZE_SCRIPT
           "/sbin/ip" = true;
           umount = true;
           mount = true;
-          "resize-rootfs" = true;
         };
         inputs =
           [
