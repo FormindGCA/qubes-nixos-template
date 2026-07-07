@@ -1,3 +1,6 @@
 #!/bin/sh
-#nix --extra-experimental-features "nix-command flakes" build .#packages.x86_64-linux.qubes-core-qubesdb --show-trace --verbose
-nix --extra-experimental-features "nix-command flakes" build .#packages.x86_64-linux.qubes-core-agent-linux --show-trace --verbose
+set -eu
+
+target="${1:-.#qubes-core-agent-linux}"
+
+nix --extra-experimental-features "nix-command flakes" build "$target" --show-trace --verbose

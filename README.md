@@ -10,11 +10,11 @@ without gpg signature verification
 1. download the template rpm from github releases or build it yourself via `nix build .#rpm` ( preferred )
 2. copy the template rpm to dom0
 ```
-qvm-run --pass-io <YOUR_DOWNLOAD_VM> 'cat <FULL_RPM_PATH>' > qubes-template-nixos-4.2.0-unavailable.noarch.rpm
+qvm-run --pass-io <YOUR_DOWNLOAD_VM> 'cat <FULL_RPM_PATH>' > qubes-template-nixos-4.3.0-unavailable.noarch.rpm
 ```
 3. install the template
 ```
-qvm-template install qubes-template-nixos-4.2.0-unavailable.noarch.rpm --nogpgcheck
+qvm-template install qubes-template-nixos-4.3.0-unavailable.noarch.rpm --nogpgcheck
 ```
 4. start the template and wait about 30s ( see qrexec notes. )
 ```
@@ -150,3 +150,4 @@ Host github.com
 ### todo
 - deal with substituteInPlace deprecation
 - clean up package fixups and resholve configuration
+- keep the legacy scripted initrd as the default until a systemd initrd migration is validated in a real TemplateVM

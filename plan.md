@@ -6,6 +6,8 @@ This project currently targets personal use on Qubes OS 4.3 template VMs.
 
 Stabilize the Qubes/NixOS integration before doing larger cleanups. Prefer small commits that are easy to test and revert.
 
+Near-term refactors should be minimal-risk cleanup only: documentation consistency, script hygiene, mechanical Nix cleanup, and small package/module cleanups that preserve behavior.
+
 ## Invariants
 
 - `qubes.StartApp` must remain resolvable through `QREXEC_SERVICE_PATH`.
@@ -27,7 +29,9 @@ Stabilize the Qubes/NixOS integration before doing larger cleanups. Prefer small
 
 ## Next Cleanup
 
-1. Continue reducing ad hoc `substituteInPlace` and `resholve` workarounds package by package.
+1. Fix documentation and helper-script drift without changing runtime behavior.
+2. Replace deprecated `substituteInPlace --replace` calls with explicit `--replace-fail` where the expected text must exist.
+3. Continue reducing ad hoc `substituteInPlace` and `resholve` workarounds package by package, starting with smaller derivations before touching `qubes-core-agent-linux`.
 
 ## Validation Checklist
 
@@ -55,6 +59,7 @@ Also verify:
 ## Later Work
 
 1. Revisit systemd initrd later in an isolated boot-debug branch before NixOS 26.11.
+2. Keep systemd initrd migration opt-in until first boot, reboot, qrexec, GUI, networking, and update checks pass in a real TemplateVM.
 
 ## Recently Completed
 
