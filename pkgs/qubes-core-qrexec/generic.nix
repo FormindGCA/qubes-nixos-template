@@ -50,17 +50,17 @@ resholve.mkDerivation rec {
   '';
 
   installPhase = ''
-    make install-base DESTDIR=$out PREFIX=/ PYTHON_PREFIX_ARG="--prefix ." LIBDIR="/lib" SYSLIBDIR="/lib"
-    make install-vm DESTDIR=$out PREFIX=/ PYTHON_PREFIX_ARG="--prefix ." LIBDIR="/lib" SYSLIBDIR="/lib"
+    make install-base DESTDIR="$out" PREFIX=/ PYTHON_PREFIX_ARG="--prefix ." LIBDIR="/lib" SYSLIBDIR="/lib"
+    make install-vm DESTDIR="$out" PREFIX=/ PYTHON_PREFIX_ARG="--prefix ." LIBDIR="/lib" SYSLIBDIR="/lib"
 
-    mv $out/usr/bin $out/bin
-    mv $out/usr/include $out/include
-    mv $out/usr/lib/qubes $out/lib/qubes
-    mv $out/usr/share $out/share
+    mv "$out/usr/bin" "$out/bin"
+    mv "$out/usr/include" "$out/include"
+    mv "$out/usr/lib/qubes" "$out/lib/qubes"
+    mv "$out/usr/share" "$out/share"
 
     substituteInPlace "$out/etc/xdg/autostart/qrexec-policy-agent.desktop" --replace-fail '/usr/lib/qubes/qrexec-policy-agent-autostart' "$out/lib/qubes/qrexec-policy-agent-autostart"
 
-    rm -rf $out/usr
+    rm -rf "$out/usr"
   '';
 
   solutions = {

@@ -1,7 +1,6 @@
 #!/usr/bin/env nix
 #!nix shell ``#.packages.x86_64-linux.nix-update`` nixpkgs#curl nixpkgs#jq --command bash
 set -ex
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE}")" &>/dev/null && pwd)"
 
 qubesVersion="${1:-${QUBES_VERSION:-4.3}}"
 qubesVersionRegex="${qubesVersion//./\.}"
@@ -12,11 +11,12 @@ update_packages() {
   local src_suffix="$2"
   shift 2
   local dirs=("$@")
-  
+
   for dir in "${dirs[@]}"; do
-    local pkg_name=$(basename "$dir")
+    local pkg_name
+    pkg_name="$(basename "$dir")"
     nix-update \
-      --version-regex $version_regex \
+      --version-regex "$version_regex" \
       --system x86_64-linux \
       --override-filename "$dir/default.nix" \
       --use-github-releases \
@@ -45,4 +45,4 @@ update_packages "v(${usbProxyMajorVersion}\.[0-9.]+)" ".src" \
 
 # these packages should work across supported Qubes release lines
 update_packages "v([0-9.]+)" ".src" \
-  "pkgs/qubes-gpg-split" \
+  "pkgs/qubes-gpg-split"

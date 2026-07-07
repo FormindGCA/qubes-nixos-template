@@ -64,7 +64,7 @@ in
     '';
 
     installPhase = ''
-      mkdir $out/
-      mv rpm/noarch/*.rpm $out/
+      mkdir "$out/"
+      mv rpm/noarch/*.rpm "$out/"
     '';
   }

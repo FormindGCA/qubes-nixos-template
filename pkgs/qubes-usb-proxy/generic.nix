@@ -37,7 +37,7 @@ resholve.mkDerivation rec {
 
     make install-vm DESTDIR=$out
 
-    mv $out/usr/lib/qubes $out/lib/qubes
+    mv "$out/usr/lib/qubes" "$out/lib/qubes"
     mv "$out/usr/lib/udev" "$out/lib/udev"
 
     # overwrite the broken symlink created by make install-vm
@@ -56,7 +56,7 @@ resholve.mkDerivation rec {
 
     substituteInPlace "$out/etc/qubes-rpc/qubes.USBAttach" --replace-fail "/usr/lib/qubes/usb-import" "\$QUBES_USB_IMPORT"
 
-    rm -rf $out/usr
+    rm -rf "$out/usr"
   '';
 
   solutions = {
