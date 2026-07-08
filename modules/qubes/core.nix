@@ -68,76 +68,6 @@ in
         services.qubes.core.package = qubes-core-agent-linux;
         services.qubes.db.enable = true;
 
-        boot.initrd.kernelModules = ["xen_blkfront" "dm_mod" "dm_snapshot"];
-        boot.kernelModules = ["xenfs"];
-
-        # Keep xenfs out of fstab/local-fs.target.  It is mounted as a Qubes
-        # service dependency instead, so failure blocks Qubes services without
-        # dropping the whole VM into emergency mode.
-        fileSystems."/proc/xen".enable = mkForce false;
-        systemd.suppressedSystemUnits = ["proc-xen.mount"];
-
-        boot.initrd.services.udev.rules = ''
-          SUBSYSTEM=="block", KERNEL=="xvda3", SYMLINK+="mapper/dmroot", ENV{SYSTEMD_ALIAS}+="/dev/mapper/dmroot"
-        '';
-
-        boot.initrd.systemd.services.qubes-dmroot = mkIf config.boot.initrd.systemd.enable {
-          description = "Create Qubes root device-mapper target";
-          wantedBy = ["initrd-root-device.target"];
-          before = ["initrd-root-device.target" "sysroot.mount"];
-          after = ["systemd-modules-load.service" "systemd-udev-trigger.service"];
-          unitConfig.DefaultDependencies = false;
-          serviceConfig = {
-            Type = "oneshot";
-            RemainAfterExit = true;
-          };
-          path = [
-            pkgs.coreutils
-            pkgs.lvm2
-            pkgs.systemd
-          ];
-          script = ''
-            set -eu
-
-            wait_for_block() {
-              local dev="$1"
-              local i=0
-              while [ ! -b "$dev" ]; do
-                if [ "$i" -ge 50 ]; then
-                  echo "$dev not found" >&2
-                  exit 1
-                fi
-                sleep 0.1
-                i=$((i + 1))
-              done
-            }
-
-            udevadm settle || true
-            wait_for_block /dev/xvda
-
-            if [ -b /dev/mapper/dmroot ]; then
-              exit 0
-            fi
-
-            mkdir -p /dev/mapper
-            if [ -b /dev/xvda3 ]; then
-              ln -s ../xvda3 /dev/mapper/dmroot
-            elif [ "$(cat /sys/block/xvda/ro)" -eq 1 ]; then
-              wait_for_block /dev/xvdc2
-              xvda_size=$(cat /sys/block/xvda/size)
-              table="0 $xvda_size snapshot /dev/xvda /dev/xvdc2 N 16"
-              dmsetup create dmroot --table "$table"
-            else
-              xvda_size=$(cat /sys/block/xvda/size)
-              table="0 $xvda_size linear /dev/xvda 0"
-              dmsetup create dmroot --table "$table"
-            fi
-
-            udevadm settle || true
-            wait_for_block /dev/mapper/dmroot
-          '';
-        };
-
         users.groups = {
           qubes = {
             # supposedly this should be 98, however 995 matches the debian value
@@ -166,6 +96,11 @@ in
           "/" = {
             device = "/dev/mapper/dmroot";
             fsType = "ext4";
+          };
+          "/proc/xen" = {
+            device = "xen";
+            fsType = "xenfs";
+            noCheck = true;
           };
           "/rw" = {
             device = "/dev/xvdb";
@@ -252,30 +187,6 @@ in
           };
         };
 
-        systemd.services.qubes-proc-xen = {
-          description = "Mount Xen control filesystem";
-          before = ["qubes-db.service"];
-          after = ["systemd-modules-load.service"];
-          serviceConfig = {
-            Type = "oneshot";
-            RemainAfterExit = true;
-          };
-          path = [
-            pkgs.coreutils
-            pkgs.kmod
-          ];
-          script = ''
-            mkdir -p /proc/xen
-            modprobe xenfs
-            mountpoint -q /proc/xen || mount -t xenfs xenfs /proc/xen
-          '';
-        };
-
-        systemd.services.qubes-db = {
-          after = ["qubes-proc-xen.service"];
-          requires = ["qubes-proc-xen.service"];
-        };
-
         systemd.services.qubes-early-vm-config = {
           # ensure the service is started on boot, since Install is ignored
           wantedBy = ["sysinit.target"];
@@ -291,7 +202,6 @@ in
 
           serviceConfig = {
             ExecStart = ["" "${qubes-core-agent-linux}/lib/qubes/init/misc-post.sh"];
-            ExecStop = ["" "${qubes-core-agent-linux}/lib/qubes/init/misc-post-stop.sh"];
           };
         };
 
