@@ -71,6 +71,11 @@ in
         boot.initrd.kernelModules = ["xen_blkfront" "dm_mod" "dm_snapshot"];
         boot.kernelModules = ["xenfs"];
 
+        # Keep xenfs out of fstab/local-fs.target.  It is mounted as a Qubes
+        # service dependency instead, so failure blocks Qubes services without
+        # dropping the whole VM into emergency mode.
+        fileSystems."/proc/xen".enable = mkForce false;
+
         boot.initrd.services.udev.rules = ''
           SUBSYSTEM=="block", KERNEL=="xvda3", SYMLINK+="mapper/dmroot", ENV{SYSTEMD_ALIAS}+="/dev/mapper/dmroot"
         '';
@@ -246,10 +251,24 @@ in
           };
         };
 
+        systemd.mounts = [
+          {
+            description = "Xen control filesystem";
+            what = "xenfs";
+            where = "/proc/xen";
+            type = "xenfs";
+            before = ["qubes-db.service"];
+            after = ["qubes-proc-xen.service"];
+            requires = ["qubes-proc-xen.service"];
+            unitConfig = {
+              DefaultDependencies = false;
+            };
+          }
+        ];
+
         systemd.services.qubes-proc-xen = {
-          description = "Mount Xen control filesystem";
-          wantedBy = ["sysinit.target"];
-          before = ["qubes-db.service"];
+          description = "Prepare Xen control filesystem mount point";
+          before = ["proc-xen.mount"];
           after = ["systemd-modules-load.service"];
           serviceConfig = {
             Type = "oneshot";
@@ -258,13 +277,16 @@ in
           path = [
             pkgs.coreutils
             pkgs.kmod
-            pkgs.util-linux
           ];
           script = ''
             mkdir -p /proc/xen
-            modprobe xenfs || true
-            mountpoint -q /proc/xen || mount -t xenfs xenfs /proc/xen || true
+            modprobe xenfs
           '';
+        };
+
+        systemd.services.qubes-db = {
+          after = ["proc-xen.mount"];
+          requires = ["proc-xen.mount"];
         };
 
         systemd.services.qubes-early-vm-config = {
@@ -282,6 +304,7 @@ in
 
           serviceConfig = {
             ExecStart = ["" "${qubes-core-agent-linux}/lib/qubes/init/misc-post.sh"];
+            ExecStop = ["" "${qubes-core-agent-linux}/lib/qubes/init/misc-post-stop.sh"];
           };
         };
 
