@@ -161,16 +161,6 @@ in
             device = "/dev/mapper/dmroot";
             fsType = "ext4";
           };
-          "/proc/xen" = {
-            device = "xenfs";
-            fsType = "xenfs";
-            noCheck = true;
-            options = [
-              "nofail"
-              "x-systemd.after=systemd-modules-load.service"
-              "x-systemd.requires=systemd-modules-load.service"
-            ];
-          };
           "/rw" = {
             device = "/dev/xvdb";
             fsType = "auto";
@@ -254,6 +244,27 @@ in
           serviceConfig = {
             ExecStart = ["" "${pkgs.qubes-linux-utils}/bin/meminfo-writer 30000 100000 /run/meminfo-writer.pid"];
           };
+        };
+
+        systemd.services.qubes-proc-xen = {
+          description = "Mount Xen control filesystem";
+          wantedBy = ["sysinit.target"];
+          before = ["qubes-db.service"];
+          after = ["systemd-modules-load.service"];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          path = [
+            pkgs.coreutils
+            pkgs.kmod
+            pkgs.util-linux
+          ];
+          script = ''
+            mkdir -p /proc/xen
+            modprobe xenfs || true
+            mountpoint -q /proc/xen || mount -t xenfs xenfs /proc/xen || true
+          '';
         };
 
         systemd.services.qubes-early-vm-config = {
