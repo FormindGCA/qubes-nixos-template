@@ -251,20 +251,19 @@ in
           };
         };
 
-        systemd.mounts = [
-          {
-            description = "Xen control filesystem";
-            what = "xenfs";
-            where = "/proc/xen";
-            type = "xenfs";
-            before = ["qubes-db.service"];
-            after = ["qubes-proc-xen.service"];
-            requires = ["qubes-proc-xen.service"];
-            unitConfig = {
-              DefaultDependencies = false;
-            };
-          }
-        ];
+        systemd.units."proc-xen.mount".text = ''
+          [Unit]
+          Description=Xen control filesystem
+          DefaultDependencies=no
+          Requires=qubes-proc-xen.service
+          After=qubes-proc-xen.service
+          Before=qubes-db.service
+
+          [Mount]
+          What=xenfs
+          Where=/proc/xen
+          Type=xenfs
+        '';
 
         systemd.services.qubes-proc-xen = {
           description = "Prepare Xen control filesystem mount point";
