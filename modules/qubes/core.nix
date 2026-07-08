@@ -75,6 +75,7 @@ in
         # service dependency instead, so failure blocks Qubes services without
         # dropping the whole VM into emergency mode.
         fileSystems."/proc/xen".enable = mkForce false;
+        systemd.suppressedSystemUnits = ["proc-xen.mount"];
 
         boot.initrd.services.udev.rules = ''
           SUBSYSTEM=="block", KERNEL=="xvda3", SYMLINK+="mapper/dmroot", ENV{SYSTEMD_ALIAS}+="/dev/mapper/dmroot"
