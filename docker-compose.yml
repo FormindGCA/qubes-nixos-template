@@ -5,6 +5,10 @@ services:
     volumes:
       - qubes-nix-store:/nix
       - qubes-nix-cache:/root/.cache/nix
+    environment:
+      NIX_CONFIG: |
+        experimental-features = nix-command flakes
+        build-users-group =
     tty: true
     stdin_open: true
 
