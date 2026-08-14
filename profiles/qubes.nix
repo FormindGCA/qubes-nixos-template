@@ -23,5 +23,6 @@
 
   # Workaround a module loading issue on boot by using the legacy stage2.
   # systemd initrd builds, but currently prevents the TemplateVM from booting.
-  boot.initrd.systemd.enable = false;
+  #boot.initrd.systemd.enable = false;
+  boot.initrd.enable = false;
 }
