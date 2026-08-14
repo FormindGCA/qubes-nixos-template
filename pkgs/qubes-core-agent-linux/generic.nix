@@ -246,6 +246,11 @@ in
 
         # use suid wrapper we will create in the module
         substituteInPlace "$out/etc/qubes-rpc/qubes.Filecopy" --replace-fail "/usr/lib/qubes/qfile-unpacker" "/run/wrappers/bin/qfile-unpacker"
+        substituteInPlace "$out/etc/qubes-rpc/qubes.ResizeDisk" \
+          --replace-fail "head /dev" "${coreutils}/bin/head /dev" \
+          --replace-fail "resize2fs /dev" "${e2fsprogs}/bin/resize2fs /dev" \
+          --replace-fail "/usr/lib/qubes/resize-rootfs" \
+            $'rpc_path="$(${coreutils}/bin/readlink -f "$0")"\n        package_root="''${rpc_path%/etc/qubes-rpc/qubes.ResizeDisk}"\n        "$package_root/lib/qubes/resize-rootfs"'
 
         # Patch Python shebangs under etc/qubes-rpc for NixOS
         substituteInPlace "$out/etc/qubes-rpc/qubes.StartApp" --replace-fail '#!/usr/bin/python3' "#!${python3}/bin/python3"
