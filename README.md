@@ -27,6 +27,10 @@ qvm-run nixos xterm
 
 at this point you can customize the template and use it like any other NixOS install. the example config has been copied to `/etc/nixos`.
 
+The minimal RPM configuration remains in `examples/`. Extended examples for a
+larger TemplateVM, a qrexec-only Nix cache StandaloneVM, and mission-specific
+flakes are documented in `examples/variants/README.md`.
+
 ## local development with docker
 
 The included compose setup runs Nix in a container and keeps the Nix store in a Docker volume.

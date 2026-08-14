@@ -5,7 +5,7 @@
     nixpkgs.url = "nixpkgs/nixos-unstable";
 
     qubes-nixos-template = {
-      url = "github:evq/qubes-nixos-template";
+      url = "github:FormindGCA/qubes-nixos-template";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
