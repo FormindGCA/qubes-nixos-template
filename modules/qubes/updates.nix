@@ -54,31 +54,15 @@ with lib; {
       '';
     };
   };
-  config = mkMerge [
-    (
-      mkIf config.services.qubes.updates.check {
-        systemd.timers.qubes-update-check = {
-          wantedBy = ["timers.target"];
-        };
-      }
-    )
-    (
-      let
+  config =
+    let
         upgradesStatusNotify = pkgs.writeShellScriptBin "upgrades-status-notify" ''
           set -e
 
           export PATH=${lib.makeBinPath cfg.extraPackages}:$PATH
 
-          if [ "$1" = "started-by-init" ]; then
-              true "INFO: Started by systemd unit (timer.) Continuing..."
-          else
-              true "INFO: Not started by systemd unit (timer.) Probably started by package manager hook script."
-              if test -e /run/qubes/persistent-full; then
-                  true "INFO: Running inside Template and Standalone. Continuing..."
-              else
-                  true "INFO: Probably running inside App Qube. Stop."
-                  exit 0
-              fi
+          if [ "$1" != "started-by-init" ] && ! test -e /run/qubes/persistent-full; then
+              exit 0
           fi
 
           tempdir=$(mktemp -d /tmp/tmp.nix-updateinfo.XXX)
@@ -164,6 +148,9 @@ with lib; {
           destination = "/etc/qubes-rpc/qubes.VMExec";
         };
       in {
+        systemd.timers.qubes-update-check = mkIf cfg.check {
+          wantedBy = ["timers.target"];
+        };
         systemd.tmpfiles.rules = [
           "d /usr/lib 0755 root root"
           "d /usr/lib/qubes 0755 root root"
@@ -178,7 +165,5 @@ with lib; {
             ExecStart = ["" "${upgradesStatusNotify}/bin/upgrades-status-notify started-by-init"];
           };
         };
-      }
-    )
-  ];
+      };
 }
