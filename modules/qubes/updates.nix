@@ -142,7 +142,7 @@ with lib; {
                 ;;
             esac
 
-            exec ${config.services.qubes.core.package.out}/bin/qubes-vmexec "$@"
+            exec ${config.services.qubes.core.basePackage.out}/bin/qubes-vmexec "$@"
           '';
           executable = true;
           destination = "/etc/qubes-rpc/qubes.VMExec";

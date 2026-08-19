@@ -36,13 +36,6 @@ in
           description = "Whether to autologin the default Qubes user on getty.";
         };
       };
-      package = mkOption {
-        type = types.package;
-        description = "qubes-core-agent-linux package used by core services.";
-        internal = true;
-        defaultText = literalExpression "pkgs.qubes-core-agent-linux";
-        default = pkgs.qubes-core-agent-linux;
-      };
       basePackage = mkOption {
         type = types.package;
         description = "Base qubes-core-agent-linux package used for generic core services and qrexec RPCs.";
@@ -65,7 +58,6 @@ in
           else "/home/${cfg.user.name}";
       in mkMerge [
         {
-        services.qubes.core.package = qubes-core-agent-linux;
         services.qubes.db.enable = true;
 
         users.groups = {
