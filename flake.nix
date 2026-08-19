@@ -27,21 +27,9 @@
       qubes-usb-proxy = prev.callPackage ./pkgs/qubes-usb-proxy { rev = qubesBranch; };
       qubes-gpg-split = prev.callPackage ./pkgs/qubes-gpg-split {};
     };
-    patched-nix-update = final: prev: {
-      nix-update =
-        prev.nix-update
-        .overrideAttrs
-        (finalAttrs: previousAttrs: {
-          patches = [./patches/nix-update/0000-fetch-from-tags.patch];
-        });
-    };
-
     pkgs = import nixpkgs {
       inherit system;
-      overlays = [
-        qubesPackages
-        patched-nix-update
-      ];
+      overlays = [qubesPackages];
     };
   in rec {
     overlays.default = qubesPackages;
