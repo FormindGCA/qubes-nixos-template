@@ -60,6 +60,7 @@ Also verify:
 
 1. Revisit systemd initrd later in an isolated boot-debug branch before NixOS 26.11.
 2. Keep systemd initrd migration opt-in until first boot, reboot, qrexec, GUI, networking, and update checks pass in a real TemplateVM.
+3. Validate Split GPG between separate client and key-holder qubes, including dom0 qrexec policy, key import, signing, and the key-access confirmation dialog.
 
 ## Recently Completed
 

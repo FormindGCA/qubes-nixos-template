@@ -89,10 +89,13 @@ packages=(
   "v(${qubesVersionRegex}\.[0-9.]+)|qubes-gui-agent-linux|qubes-gui-agent-linux|pkgs/qubes-gui-agent-linux"
   "v(${qubesVersionRegex}\.[0-9.]+)|qubes-linux-utils|qubes-linux-utils|pkgs/qubes-linux-utils"
   "v(${usbProxyMajorVersion}\.[0-9.]+)|qubes-usb-proxy|qubes-app-linux-usb-proxy|pkgs/qubes-usb-proxy"
-#"v([0-9.]+)|qubes-gpg-split|qubes-app-linux-split-gpg|pkgs/qubes-gpg-split"
 )
 
 for package_spec in "${packages[@]}"; do
   IFS='|' read -r version_regex package repository package_dir <<<"$package_spec"
   update_package "$version_regex" "$package" "$repository" "$package_dir"
 done
+
+# split-gpg publishes tags but has no release4.x branch.
+qubesBranch="" update_package "v([0-9.]+)" \
+  qubes-gpg-split qubes-app-linux-split-gpg pkgs/qubes-gpg-split

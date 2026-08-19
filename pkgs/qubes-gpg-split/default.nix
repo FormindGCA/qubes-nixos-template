@@ -2,23 +2,25 @@
   lib,
   fetchFromGitHub,
   resholve,
+  stdenv,
   coreutils,
   qubes-core-qrexec,
   gnupg,
+  libnotify,
   pandoc,
-  rev ? null,
+  zenity,
 }:
 let
   qubesLib = import ../lib.nix {inherit lib fetchFromGitHub;};
 in
 resholve.mkDerivation rec {
   pname = "qubes-gpg-split";
-  version = "2.0.84";
+  version = "2.0.86";
 
   src = qubesLib.fetchFromQubes {
     repo = "qubes-app-linux-split-gpg";
-    inherit version rev;
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    inherit version;
+    hash = "sha256-ho5xEiNBbjMmSd1x7VHO/KXadhJmn0U6sMEUUw0WQUo=";
   };
 
   postPatch = ''
@@ -49,8 +51,18 @@ resholve.mkDerivation rec {
 
     mv $out/usr/bin $out/bin
     mv $out/usr/share $out/share
-    # NOTE: tmpfiles.d integration would be needed to use a NixOS qube as the GPG domain (key holder).
-    # Currently only client-side GPG splitting is supported.
+    substituteInPlace $out/etc/qubes-rpc/qubes.Gpg \
+      --replace-fail '#!/bin/sh' '#!${stdenv.shell}' \
+      --replace-fail /usr/lib/qubes-gpg-split/gpg-server $out/lib/qubes-gpg-split/gpg-server \
+      --replace-fail /usr/bin/gpg2 ${gnupg}/bin/gpg \
+      --replace-fail 'stat -c' '${coreutils}/bin/stat -c' \
+      --replace-fail 'date +%s' '${coreutils}/bin/date +%s' \
+      --replace-fail 'touch "$stat_file"' '${coreutils}/bin/touch "$stat_file"' \
+      --replace-fail 'zenity --question' '${zenity}/bin/zenity --question' \
+      --replace-fail 'notify-send ' '${libnotify}/bin/notify-send '
+    substituteInPlace $out/etc/qubes-rpc/qubes.GpgImportKey \
+      --replace-fail '#!/bin/sh' '#!${stdenv.shell}' \
+      --replace-fail /usr/bin/gpg2 ${gnupg}/bin/gpg
     rm -rf $out/usr
   '';
 
@@ -78,8 +90,6 @@ resholve.mkDerivation rec {
         "cannot:bin/qubes-gpg-client"
         "cannot:bin/qubes-gpg-import-key"
         "cannot:${gnupg}/bin/gpg"
-        # NOTE: client-only mode. qubes-gpg-import-key passes absolute paths to qrexec-client-vm,
-        # but the execer correctly allows execution even when exact arguments aren't known.
         "cannot:${qubes-core-qrexec}/bin/qrexec-client-vm"
       ];
     };
