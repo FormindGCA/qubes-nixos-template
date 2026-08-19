@@ -34,11 +34,6 @@
   in rec {
     overlays.default = qubesPackages;
     nixosModules.default = {
-      config,
-      lib,
-      pkgs,
-      ...
-    }: {
       imports = [
         ./modules/qubes/core.nix
         ./modules/qubes/db.nix
@@ -52,11 +47,6 @@
       ];
     };
     nixosProfiles.default = {
-      config,
-      lib,
-      pkgs,
-      ...
-    }: {
       imports = [
         ./profiles/qubes.nix
       ];
