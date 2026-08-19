@@ -1,5 +1,6 @@
 {pkgs, ...}: {
   environment.systemPackages = with pkgs; [
+    # Add the tools you use the most here
     curl
     fd
     file

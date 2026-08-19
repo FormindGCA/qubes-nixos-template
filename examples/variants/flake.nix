@@ -23,11 +23,15 @@
     qubesModules = [
       qubes-nixos-template.nixosModules.default
       qubes-nixos-template.nixosProfiles.default
+      # Inherit the base configuration
       (import "${qubes-nixos-template}/examples/configuration.nix")
       ./common.nix
     ];
   in {
     nixosConfigurations = {
+
+      # Used as a based template with a maximum of tools
+      # AppVMs will inherit the cache client config
       nix-template = nixpkgs.lib.nixosSystem {
         inherit pkgs system;
         modules = qubesModules ++ [
@@ -36,6 +40,8 @@
         ];
       };
 
+      # Only for the caching server
+      # Should be run as a StandaloneVM
       nix-cache = nixpkgs.lib.nixosSystem {
         inherit pkgs system;
         modules = qubesModules ++ [./qrexec-cache-server.nix];

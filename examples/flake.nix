@@ -1,9 +1,11 @@
 {
-  description = "example nixos templatevm configuration";
+  description = "Example nixos templatevm configuration";
 
   inputs = {
+    # Base pkgs
     nixpkgs.url = "nixpkgs/nixos-unstable";
 
+    # Use your fork if you need to pin the qubes pkgs version
     qubes-nixos-template = {
       url = "github:FormindGCA/qubes-nixos-template";
       inputs.nixpkgs.follows = "nixpkgs";
