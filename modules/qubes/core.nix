@@ -207,8 +207,7 @@ in
         };
 
         systemd.services.qubes-rootfs-resize = {
-          wantedBy = ["multi-user.target"];
-          after = ["qubes-sysinit.service"];
+          after = ["qubes-sysinit.service" "multi-user.target"];
 
           serviceConfig = {
             Type = "oneshot";
@@ -216,6 +215,10 @@ in
             TimeoutSec = 10;
             ExecStart = ["" "${qubes-core-agent-linux}/lib/qubes/init/resize-rootfs-if-needed.sh"];
           };
+        };
+        systemd.timers.qubes-rootfs-resize = {
+          wantedBy = ["timers.target"];
+          timerConfig.OnBootSec = "30s";
         };
 
         systemd.services.qubes-sysinit = {

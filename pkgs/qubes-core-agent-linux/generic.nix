@@ -272,9 +272,6 @@ in
           'sources=( "/usr/lib/qubes-bind-dirs.d" "/etc/qubes-bind-dirs.d" )' \
           "sources=( \"$out/lib/qubes-bind-dirs.d\" )"
 
-        substituteInPlace "$out/lib/qubes/init/resize-rootfs-if-needed.sh" \
-          --replace-fail '/usr/lib/qubes/resize-rootfs' 'resize-rootfs'
-
         # replace with a version that has device checks and timeouts on blocking commands
         cat > "$out/lib/qubes/init/resize-rootfs-if-needed.sh" << 'RESIZE_SCRIPT'
 #!/bin/sh
