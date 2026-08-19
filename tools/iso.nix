@@ -53,10 +53,7 @@
       fi
 
       mebibyte=$(( 1024 * 1024 ))
-      round_to_nearest() {
-        echo $(( ( $1 / $2 + 1) * $2 ))
-      }
-      bootSize=$(round_to_nearest "$(numfmt --from=iec '${bootSize}')" $mebibyte)
+      bootSize=$(( ( $(numfmt --from=iec '${bootSize}') / mebibyte + 1) * mebibyte ))
       bootSizeMiB=$(( bootSize / 1024 / 1024 ))MiB
 
       parted --script "$DEVICE_MAIN" -- \
@@ -91,10 +88,6 @@
       reboot
     '';
   };
-  installerFailsafe = pkgs.writeShellScript "failsafe" ''
-    ${lib.getExe installer} || echo "ERROR: Installation failure!"
-    sleep 3600
-  '';
 in {
   imports = [
     (modulesPath + "/installer/cd-dvd/iso-image.nix")
@@ -117,7 +110,8 @@ in {
 
       reset
 
-      ${installerFailsafe}
+      ${lib.getExe installer} || echo "ERROR: Installation failure!"
+      sleep 3600
     fi
   '';
 
