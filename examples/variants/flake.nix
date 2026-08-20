@@ -25,7 +25,6 @@
       qubes-nixos-template.nixosProfiles.default
       # Inherit the base configuration
       (import "${qubes-nixos-template}/examples/configuration.nix")
-      ./common.nix
     ];
   in {
     nixosConfigurations = {
