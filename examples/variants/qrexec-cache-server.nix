@@ -37,8 +37,5 @@ in {
     };
   };
 
-  environment.systemPackages = with pkgs; [
-    git
-    nix-serve
-  ];
+  environment.systemPackages = [pkgs.git];
 }

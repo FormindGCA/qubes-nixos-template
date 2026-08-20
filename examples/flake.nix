@@ -13,7 +13,6 @@
   };
 
   outputs = {
-    self,
     nixpkgs,
     qubes-nixos-template,
     ...

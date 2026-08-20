@@ -10,7 +10,4 @@ WORKDIR /workspace
 # Copy repository contents into the container.
 COPY . /workspace
 
-# Verify Nix is available.
-RUN nix --version
-
 CMD ["/bin/sh"]
