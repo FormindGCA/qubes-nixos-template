@@ -1,156 +1,183 @@
-# nix expressions for creating a qubes templatevm
+# Qubes NixOS Template
 
-This repository currently targets Qubes OS 4.3 template VMs.
+Build a NixOS TemplateVM for Qubes OS 4.3 as an RPM or unattended installer ISO.
 
-## getting started
+> [!WARNING]
+> Installing the RPM copies files into dom0 and currently requires `--nogpgcheck`.
+> Review the build and proceed at your own risk.
 
-*warning*: proceed at your own risk, this involves copying files to dom0 and installing a template
-without gpg signature verification
+## Installation
 
-1. download the template rpm from github releases or build it yourself via `nix build .#rpm` ( preferred )
-2. copy the template rpm to dom0
+### Template RPM
+
+1. Download the template RPM from GitHub Releases or build it with `nix build .#rpm`.
+2. Copy it from a download qube to dom0:
+
+   ```sh
+   qvm-run --pass-io <download-qube> 'cat <full-rpm-path>' > qubes-template-nixos.rpm
+   ```
+
+3. Install it in dom0:
+
+   ```sh
+   qvm-template install qubes-template-nixos.rpm --nogpgcheck
+   ```
+
+4. Start the template, wait about 30 seconds for the Qubes services, then open a terminal:
+
+   ```sh
+   qvm-start nixos
+   qvm-run nixos xterm
+   ```
+
+The example NixOS configuration is copied to `/etc/nixos` for further customization.
+
+### Installer ISO
+
+The ISO installs into a fresh HVM TemplateVM without first installing an RPM in dom0.
+
+1. Download the installer ISO from GitHub Releases.
+2. Create a TemplateVM with no template or networking and open its settings.
+3. Set its kernel to `provided by qube` and virtualization mode to `HVM`.
+4. Boot the qube from the ISO; installation starts automatically after root autologin.
+5. Wait for the successful installation to reboot the qube, then shut it down.
+6. Restore the default kernel and `PVH` virtualization mode.
+7. Start the template and open a terminal as shown above.
+
+## Configuration
+
+The minimal RPM configuration is in `examples/`. Larger TemplateVM, qrexec Nix cache, and mission-specific flake examples are documented in `examples/variants/README.md`.
+
+### Qubes Updater
+
+The updater uses the VM hostname as the flake configuration name. Set an explicit name when a cloned or renamed template does not match the flake output:
+
+```nix
+services.qubes.updates.flakeConfiguration = "nixos";
 ```
-qvm-run --pass-io <YOUR_DOWNLOAD_VM> 'cat <FULL_RPM_PATH>' > qubes-template-nixos-4.3.0-unavailable.noarch.rpm
-```
-3. install the template
-```
-qvm-template install qubes-template-nixos-4.3.0-unavailable.noarch.rpm --nogpgcheck
-```
-4. start the template and wait about 30s ( see qrexec notes. )
-```
-qvm-start nixos
-```
-5. start a terminal in the template
-```
-qvm-run nixos xterm
+
+By default, update checks refresh the `nixpkgs` and `qubes-nixos-template` inputs. Change `services.qubes.updates.updateInputs`, or set it to `[]` to keep the existing lock file unchanged.
+
+### Split GPG
+
+Enable the client in a qube that delegates GPG operations:
+
+```nix
+services.qubes.gpgSplit.enable = true;
 ```
 
-at this point you can customize the template and use it like any other NixOS install. the example config has been copied to `/etc/nixos`.
+Enable the RPC services in the isolated key-holder qube:
 
-The minimal RPM configuration remains in `examples/`. Extended examples for a
-larger TemplateVM, a qrexec-only Nix cache StandaloneVM, and mission-specific
-flakes are documented in `examples/variants/README.md`.
+```nix
+services.qubes.gpgSplit = {
+  enable = true;
+  server = true;
+};
+```
 
-## local development with docker
+Dom0 policy must allow the client to call `qubes.Gpg` and `qubes.GpgImportKey` in the key-holder qube. Select the target through `/rw/config/gpg-split-domain` or through the dom0 policy default.
 
-The included compose setup runs Nix in a container and keeps the Nix store in a Docker volume.
+### SSH Git Proxy
 
-Rebuild the image after changing files, because the Dockerfile copies the repository into `/workspace`:
+The standard Qubes updates proxy does not allow HTTP CONNECT to SSH ports. A dedicated proxy qube can expose `qubes.SshProxy` through tinyproxy configured with `ConnectPort 22` and any other required SSH ports.
+
+Configure the TemplateVM side:
+
+```nix
+services.qubes.sshProxy = {
+  enable = true;
+  target = "sys-firewall-vpn";
+  # port = 8083;
+};
+```
+
+Enable the `ssh-proxy-setup` Qubes service for the TemplateVM or derived qube. The module starts `qubes-nixos-ssh-proxy.socket` on `127.0.0.1:8083` and forwards connections over qrexec.
+
+Point SSH at the local HTTP CONNECT endpoint:
+
+```sshconfig
+Host github.com
+  ProxyCommand socat STDIO PROXY:127.0.0.1:%h:%p,proxyport=8083
+```
+
+The proxy-qube RPC implementation, tinyproxy changes, and dom0 policy are external prerequisites and are not installed by this repository.
+
+## Integration Notes
+
+### qrexec and RPC Paths
+
+Qubes expects RPC services under `/etc/qubes-rpc`. The module assembles that directory from configured qrexec packages and keeps it first in `QREXEC_SERVICE_PATH`.
+
+Generic services such as `qubes.StartApp` come from `services.qubes.core.basePackage`. Networking scripts such as `setup-ip` come from `services.qubes.core.networkingPackage`, so enabling networking does not change the package providing generic RPC services.
+
+Python RPC entry points use explicit Python and library paths so `qubes.StartApp` and `qubes.VMExec` can import `qubesagent` and `qubesdb`. A compatibility link from `/usr/share` to `/run/current-system/sw/share` supports upstream tools with hard-coded paths.
+
+### Updates Proxy
+
+The networking module sets `all_proxy=http://127.0.0.1:8082` only for `nix-daemon` and `qubes-update-check`. Interactive `nix`, `nix-shell`, and `nixos-rebuild` aliases read the same value from `nix-daemon`; unrelated commands and login sessions are not proxied.
+
+`sudo` may discard the proxy used by an interactive Nix alias. Enter an interactive root shell with `sudo su` when a client-side Nix fetch needs the updates proxy.
+
+### Boot and Storage
+
+The profile disables the NixOS initrd because Qubes supplies the guest kernel and the systemd initrd currently prevents a TemplateVM from booting.
+
+Automatic root filesystem growth runs from `qubes-rootfs-resize.timer`, 30 seconds after boot and after `multi-user.target`. Its service has a 10-second timeout so resize failures cannot delay normal boot.
+
+## Development
+
+The Compose environment runs Nix in a container and keeps the Nix store in a Docker volume. Rebuild the image after source changes because the Dockerfile copies the repository into `/workspace`:
 
 ```sh
 docker compose build
 ```
 
-Build a focused package while iterating:
+Refresh the pinned Qubes package versions and source hashes with:
+
+```sh
+./update.sh
+```
+
+The script leaves unchanged pins alone and reports them as `[-] No update`. When a version or branch hash changes, it prints `[+] Update available`, shows the old and new hash, and updates the package's `default.nix` pin in place. Set `QUBES_BRANCH` to an empty value to hash release tags instead of the configured Qubes release branch.
+
+Build focused packages:
 
 ```sh
 docker compose run --rm nix nix --extra-experimental-features "nix-command flakes" build --no-link --impure .#qubes-gui-agent-linux
 docker compose run --rm nix nix --extra-experimental-features "nix-command flakes" build --no-link --impure .#qubes-core-agent-linux
 ```
 
-Build the full example system closure:
+Build the complete example system:
 
 ```sh
 docker compose run --rm nix nix --extra-experimental-features "nix-command flakes" build --no-link --impure .#nixosConfigurations.nixos.config.system.build.toplevel
 ```
 
-Network timeouts while fetching Qubes or nixpkgs sources can fail an otherwise valid build. Retrying the same command is usually enough once the source has been fetched into the Docker volume.
+Transient network failures may require retrying after sources have entered the Docker-backed Nix store.
 
-## qrexec / RPC notes
+## Project Status
 
-Qubes expects RPC services under `/etc/qubes-rpc`, so the NixOS module generates that directory from the configured qrexec service packages. The qrexec service path also keeps `/etc/qubes-rpc` first for compatibility.
+Working:
 
-Generic RPC services such as `qubes.StartApp` come from `services.qubes.core.basePackage`. Networking scripts such as `setup-ip` come from `services.qubes.core.networkingPackage`, so enabling networking does not change the package that provides generic RPCs.
+- AppVM networking and qrexec
+- Xorg, clipboard, and file copy
+- Application menu and icon export
+- Memory reporting and ballooning
+- Qubes update checks and update proxy
+- SSH over qrexec
+- USB proxy
+- Template RPM and installer ISO builds
 
-Some upstream Qubes tools still use hard-coded `/usr/share` paths. The core module creates `/usr/share -> /run/current-system/sw/share` so those tools can find desktop files and Qubes XDG override data on NixOS.
+Needs real-VM validation or further work:
 
-The Python RPC entry points are wrapped with explicit `PYTHONPATH` and library paths. In particular, `qubes.StartApp` and `qubes.VMExec` need to import `qubesagent` and `qubesdb` outside a normal Python package entry point.
+- qrexec commands may fail during early startup
+- Automatic root filesystem growth on the delayed timer
+- Split GPG client and key-holder flows
+- SSH Git proxy with the external proxy-qube setup
+- Non-Xen kernels and NetVM or USBVM roles
+- RPC time synchronization and audio
+- Applications with missing or unusual icons may emit appmenu warnings
+- Memory resizing may cause Firefox crashes
+- Systemd initrd migration
 
-The Qubes profile intentionally keeps the legacy scripted initrd for now. The systemd initrd path builds, but has been tested to break TemplateVM boot in Qubes, so the `Scripted initrd is deprecated` warning is expected until that migration is debugged separately.
-
-When using Qubes OS Updater on a cloned or renamed template, set `services.qubes.updates.flakeConfiguration` to the flake configuration name to build. By default the updater uses the VM hostname, so a template named `formol` will look for `nixosConfigurations.formol`. If the flake only defines `nixosConfigurations.nixos`, configure:
-
-```nix
-services.qubes.updates.flakeConfiguration = "nixos";
-```
-
-By default the updater refreshes the `nixpkgs` and `qubes-nixos-template` flake inputs before checking and applying updates. Override `services.qubes.updates.updateInputs` to change that list, or set it to `[]` to use the existing lock file unchanged.
-
-## alternative install via iso
-
-for those that want to avoid installing anything in dom0, these instructions will allow you to install to
-a fresh hvm template.
-
-1. download the custom installer iso from github releases
-2. create a new qube, select type "TemplateVM", template "(none)", name "nixos", networking "(none)", tick "Launch settings after creation", press "OK" button
-3. in the settings for the new qube, go to the advanced tab, change the kernel to "(provided by qube)" and virtualization mode to "HVM", press "Apply" button
-4. click the "boot qube from CD-ROM" button, click the "from file in qube" option and browse for the downloaded iso. press "OK" button, the qube will launch a boot console
-5. wait for about 15s then press enter to begin the install ( the boot console will say "Press Enter to continue" )
-6. the system will auto shutdown on successful install
-7. open the settings for the qube, go to the advanced tab, change the kernel to "default (...)" and virtualization mode to "default (PVH)"
-8. start the template and wait about 30s ( see qrexec notes. )
-```
-qvm-start nixos
-```
-9. start a terminal in the template
-```
-qvm-run nixos xterm
-```
-
-## issues with the qubes updates proxy
-
-by default a qubes template does not have direct internet access and instead uses the qubes updates proxy
-over qrpc. nix does not have a concept of a global proxy setting and as such is tricky to correctly 
-configure in a way that doesn't involve simply setting `all_proxy` everywhere. 
-
-as a compromise the packaging sets `all_proxy` for nix-daemon but not all downloads go through nix-daemon. the qubes packaging in this repo creates aliases for interactive shells that wrap a few of the common nix programs to pass proxy info. however this leaves various edge cases, a few of which are noted below. remember that you can always set `all_proxy` in your environment manually or in the worst case, switch to giving the template direct internet access.
-
-### issues with sudo nix commands
-
-due to the above, you're likely to run into issues when running `sudo nix...` - in these cases you can instead first get an interactive root shell e.g. via `sudo su`.
-
-### issues with remote nix configs on github
-
-you may run into issues if you pull a remote nix config over ssh from github. to workaround
-you can add the following to `~/.ssh/config` ( the host and port overrides are necessary since these
-qubes updates proxy filters port 22. ):
-```
-Host github.com
-  HostName ssh.github.com
-  Port 443
-  ProxyCommand nc -X connect -x 127.0.0.1:8082 %h %p
-```
-
-## notes
-
-### what works
-- qrexec eventually works
-- appvm networking
-- xorg
-- copy / paste
-- qvm-copy
-- ssh over qrexec ( handy for using --target-host with nixos-rebuild )
-- memory reporting / ballooning
-- qubes update checks
-- qubes update triggers ( requires unmerged upstream changes )
-- application menu export and dom0 shortcut sync via `qubes.GetAppmenus`
-- application icon export via `qubes.GetImageRGBA` for normal desktop icons
-- usb proxy
-- building an rpm for the templatevm
-- update proxy
-
-### what doesn't work / untested
-- qrexec startup isn't clean, commands can fail initially
-- some applications with missing or unusual icons may still show icon warnings during appmenu sync
-- using a non-xen provided kernel
-- using as netvm or usbvm
-- time sync via rpc ( currently handled is systemd-timesyncd, but per vm ntp sync creates more attack surface area? )
-- audio
-- grow root fs
-
-### bugs
-- memory resizing seems to cause crashes in ff
-
-### todo
-- continue cleaning package fixups and resholve configuration
-- keep the legacy scripted initrd as the default until a systemd initrd migration is validated in a real TemplateVM
+See `plan.md` for current invariants, validation steps, and remaining work.

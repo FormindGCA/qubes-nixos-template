@@ -41,6 +41,7 @@
         ./modules/qubes/gpg-split.nix
         ./modules/qubes/networking.nix
         ./modules/qubes/qrexec.nix
+        ./modules/qubes/ssh-proxy.nix
         ./modules/qubes/sshd.nix
         ./modules/qubes/updates.nix
         ./modules/qubes/usb.nix

@@ -62,21 +62,39 @@ update_package() {
   local package="$2"
   local repository="$3"
   local package_dir="$4"
+  local pin_file="$package_dir/default.nix"
+  local current_version
+  local current_hash
   local version
   local hash
 
+  current_version="$(sed -n -E 's|^  version = "([^"]*)";|\1|p' "$pin_file")"
+  current_hash="$(sed -n -E 's|^ +hash = "([^"]*)";|\1|p' "$pin_file")"
+  [[ -n "$current_version" && -n "$current_hash" ]] || {
+    printf 'unable to read package pin from %s\n' "$pin_file" >&2
+    return 1
+  }
+
   version="$(latest_tag "$version_regex" "$repository")"
+  version="${version#v}"
   if [[ -n "$qubesBranch" ]]; then
     hash="$(source_hash "$repository" "heads/$qubesBranch")"
   else
-    hash="$(source_hash "$repository" "tags/$version")"
+    hash="$(source_hash "$repository" "tags/v$version")"
   fi
 
+  if [[ "$current_version" == "$version" && "$current_hash" == "$hash" ]]; then
+    printf '[-] No update: %s %s\n' "$package" "$current_version"
+    return
+  fi
+
+  printf '[+] Update available: %s %s -> %s\n' "$package" "$current_version" "$version"
+  printf '    hash: %s -> %s\n' "$current_hash" "$hash"
   sed -i -E \
-    -e "s|^  version = \"[^\"]*\";|  version = \"${version#v}\";|" \
+    -e "s|^  version = \"[^\"]*\";|  version = \"$version\";|" \
     -e "s|^   *hash = \"[^\"]*\";|  hash = \"$hash\";|" \
-    "$package_dir/default.nix"
-  printf '%s: %s (%s)\n' "$package" "${version#v}" "$hash"
+    "$pin_file"
+  printf '    applied: %s\n' "$pin_file"
 }
 
 # Each row contains: version regex, flake package, GitHub repository, package directory.
