@@ -359,7 +359,7 @@ RESIZE_SCRIPT
         cat >> "$out/lib/qubes/update-proxy-configs" <<EOT
 
         # NixOS
-        if [ -d /run/current-system ]; then
+        if [ -d /run/current-system ] && [ -e /run/qubes/persistent-full ]; then
             # setup for anything using nix-daemon
             mkdir -p /run/systemd/system/nix-daemon.service.d
             cat > /run/systemd/system/nix-daemon.service.d/override.conf <<EOF

@@ -13,6 +13,11 @@ with lib; {
 
     services.resolved.enable = true;
     services.udev.packages = [config.services.qubes.core.networkingPackage];
+    # The base package stubs update-proxy-configs; the networking package applies the QubesDB-selected proxy.
+    systemd.services.qubes-misc-post.serviceConfig.ExecStart = mkForce [
+      ""
+      "${config.services.qubes.core.networkingPackage}/lib/qubes/init/misc-post.sh"
+    ];
 
     systemd.services.qubes-network-uplink = {
       # ensure the service is started on boot, since Install is ignored
