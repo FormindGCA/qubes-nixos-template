@@ -1,6 +1,5 @@
 {
   lib,
-  stdenv,
   fetchFromGitHub,
   resholve,
   coreutils,
@@ -19,12 +18,12 @@
   rev ? null,
 }: let
   qubesLib = import ../lib.nix {inherit lib fetchFromGitHub;};
-  basePname = "qubes-linux-utils";
-  resholved = resholve.mkDerivation rec {
+in
+  resholve.mkDerivation rec {
     inherit version;
-    pname = "${basePname}-resholved";
+    pname = "qubes-linux-utils";
 
-    src = qubesLib.fetchFromQubes {repo = basePname; inherit version hash rev;};
+    src = qubesLib.fetchFromQubes {repo = pname; inherit version hash rev;};
 
     nativeBuildInputs =
       [
@@ -72,6 +71,8 @@
       mv "$out/usr/lib/systemd" "$out/lib/systemd"
 
       rm -rf "$out/usr"
+      substituteInPlace "$out/lib/udev/rules.d/99-qubes-usb.rules" --replace-fail '/usr/lib/qubes/' "$out/lib/qubes/"
+      substituteInPlace "$out/lib/udev/rules.d/99-qubes-block.rules" --replace-fail '/usr/lib/qubes/' "$out/lib/qubes/"
     '';
 
     solutions = {
@@ -97,21 +98,4 @@
     };
 
     meta = qubesLib.meta "Common Linux files for Qubes VM.";
-  };
-in
-  stdenv.mkDerivation {
-    src = resholved;
-    pname = basePname;
-    inherit version;
-
-    dontConfigure = true;
-    dontBuild = true;
-
-    installPhase = ''
-      cp -R $src $out
-      substituteInPlace "$out/lib/udev/rules.d/99-qubes-usb.rules" --replace-fail '/usr/lib/qubes/' "${resholved}/lib/qubes/"
-      substituteInPlace "$out/lib/udev/rules.d/99-qubes-block.rules" --replace-fail '/usr/lib/qubes/' "${resholved}/lib/qubes/"
-    '';
-
-    meta = resholved.meta;
   }

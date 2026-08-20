@@ -20,7 +20,6 @@ in
 
     config = mkIf config.services.qubes.gui.enable {
       services.qubes.core.enable = true;
-      services.qubes.db.enable = true;
       services.qubes.qrexec.enable = true;
 
       services.udev.packages = [
