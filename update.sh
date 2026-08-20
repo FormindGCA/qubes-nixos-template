@@ -50,11 +50,10 @@ latest_tag() {
 source_hash() {
   local repository="$1"
   local ref="$2"
-  local base32_hash
 
-  base32_hash="$(nix-prefetch-url --unpack \
-    "https://github.com/QubesOS/${repository}/archive/refs/${ref}.tar.gz" 2>/dev/null)"
-  nix hash convert --hash-algo sha256 --from nix32 --to sri "$base32_hash"
+  nix store prefetch-file --unpack --json \
+    "https://github.com/QubesOS/${repository}/archive/refs/${ref}.tar.gz" 2>/dev/null \
+    | jq -r .hash
 }
 
 update_package() {
