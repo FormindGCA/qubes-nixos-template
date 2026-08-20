@@ -38,6 +38,7 @@
   xen,
   xfce4-settings,
   xfconf,
+  setxkbmap,
   xprop,
   xinit,
   xsetroot,
@@ -137,6 +138,7 @@ resholve.mkDerivation rec {
     # this will point to the unresholved package but it is not an
     # issue since our wrapper only refers to external resources
     substituteInPlace "$out/etc/xdg/autostart/qubes-qrexec-fork-server.desktop" --replace-fail '/usr/bin/qrexec-fork-server' "$out/bin/qrexec-fork-server"
+    rm "$out/etc/xdg/autostart/qubes-keymap.desktop"
 
     qubesRunXorg="$out/usr/bin/qubes-run-xorg"
     qubesSession="$out/usr/bin/qubes-session"
@@ -181,6 +183,7 @@ resholve.mkDerivation rec {
     default = {
       scripts = [
         "lib/qubes/qubes-gui-agent-pre.sh"
+        "lib/qubes/qubes-keymap.sh"
         "bin/qubes-run-xorg"
         "bin/qubes-session"
         "etc/X11/xinit/xinitrc.d/50guivm-windows-prefix.sh"
@@ -213,6 +216,7 @@ resholve.mkDerivation rec {
         dbus
         gnused
         qubes-core-qubesdb
+        setxkbmap
         systemd
         util-linux
         which

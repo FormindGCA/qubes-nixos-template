@@ -58,6 +58,14 @@ services.qubes.updates.flakeConfiguration = "nixos";
 
 By default, update checks refresh the `nixpkgs` and `qubes-nixos-template` inputs. Change `services.qubes.updates.updateInputs`, or set it to `[]` to keep the existing lock file unchanged.
 
+### Keyboard Layout
+
+The GUI module synchronizes active X displays with the QubesDB `/keyboard-layout` value and watches for runtime changes. It is enabled by default when `services.qubes.gui` is enabled. Disable it with:
+
+```nix
+services.qubes.gui.keyboardLayout.enable = false;
+```
+
 ### Split GPG
 
 Enable the client in a qube that delegates GPG operations:
@@ -172,6 +180,7 @@ Needs real-VM validation or further work:
 
 - qrexec commands may fail during early startup
 - Automatic root filesystem growth on the delayed timer
+- QubesDB keyboard-layout synchronization across graphical sessions
 - Split GPG client and key-holder flows
 - SSH Git proxy with the external proxy-qube setup
 - Non-Xen kernels and NetVM or USBVM roles

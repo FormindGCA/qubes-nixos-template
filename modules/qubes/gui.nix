@@ -4,6 +4,7 @@
   pkgs,
   ...
 }: let
+  cfg = config.services.qubes.gui;
   # configure PATH so qubes-gui can find qubes-run-xorg
   # NOTE ideally this would be a normal makeWrapper, however the wrapper is created
   # before resholve rewrites the shell scripts and thus has the unresholved PATH.
@@ -16,9 +17,16 @@
   '';
 in
   with lib; {
-    options.services.qubes.gui.enable = mkEnableOption "the qubes gui agent daemon";
+    options.services.qubes.gui = {
+      enable = mkEnableOption "the qubes gui agent daemon";
+      keyboardLayout.enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Synchronize the X keyboard layout with the QubesDB /keyboard-layout value.";
+      };
+    };
 
-    config = mkIf config.services.qubes.gui.enable {
+    config = mkIf cfg.enable {
       services.qubes.core.enable = true;
       services.qubes.qrexec.enable = true;
 
@@ -51,6 +59,15 @@ in
       systemd.user.targets.nixos-fake-graphical-session = {
         requires = ["xdg-desktop-autostart.target" "graphical-session.target"];
         before = ["xdg-desktop-autostart.target" "graphical-session.target"];
+      };
+      systemd.user.services.qubes-nixos-keyboard-layout = mkIf cfg.keyboardLayout.enable {
+        description = "Synchronize the Qubes keyboard layout";
+        partOf = ["graphical-session.target"];
+        wantedBy = ["graphical-session.target"];
+        serviceConfig = {
+          ExecStart = "${pkgs.qubes-gui-agent-linux}/lib/qubes/qubes-keymap.sh";
+          Restart = "on-failure";
+        };
       };
       # adding to system packages will cause their xdg autostart files to be picked up
       environment.systemPackages = [

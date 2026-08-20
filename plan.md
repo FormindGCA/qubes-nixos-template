@@ -34,7 +34,7 @@ Further package cleanup should be driven by a concrete build or runtime problem 
 
 1. Validate Split GPG between separate client and key-holder qubes, including dom0 qrexec policy, key import, signing, and the key-access confirmation dialog.
 2. Validate delayed automatic root filesystem growth in a resized TemplateVM.
-3. Evaluate optional QubesDB keyboard-layout synchronization across graphical sessions.
+3. Validate QubesDB keyboard-layout synchronization across graphical sessions.
 4. Design optional Split SSH agent forwarding without making `nix-daemon` depend on an unavailable vault.
 5. Continue reducing package fixups only where a focused build or runtime test demonstrates they are unnecessary.
 
@@ -59,6 +59,7 @@ Also verify:
 - Qubes Updater / `qubes.VMExec`
 - networking in an AppVM based on the template
 - application shortcut sync from dom0
+- keyboard-layout changes from dom0 across active X displays
 - basic qrexec command execution
 - Nix update proxying without proxy variables in unrelated shell commands
 - SSH Git cloning through the optional `qubes.SshProxy` transport
