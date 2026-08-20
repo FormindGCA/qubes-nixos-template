@@ -114,7 +114,7 @@ Python RPC entry points use explicit Python and library paths so `qubes.StartApp
 
 ### Updates Proxy
 
-The networking module sets `all_proxy=http://127.0.0.1:8082` only for `nix-daemon` and `qubes-update-check`. Interactive `nix`, `nix-shell`, and `nixos-rebuild` aliases read the same value from `nix-daemon`; unrelated commands and login sessions are not proxied.
+Qubes' `update-proxy-configs` sets the proxy dynamically for `nix-daemon` and `qubes-update-check` only when the qube has the updates-proxy service enabled. Interactive `nix`, `nix-shell`, and `nixos-rebuild` aliases read that runtime value from `nix-daemon`; derived AppVMs do not receive a fixed proxy from the NixOS configuration.
 
 `sudo` may discard the proxy used by an interactive Nix alias. Enter an interactive root shell with `sudo su` when a client-side Nix fetch needs the updates proxy.
 

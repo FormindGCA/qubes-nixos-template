@@ -11,9 +11,6 @@ with lib; {
   config = mkIf config.services.qubes.networking.enable {
     services.qubes.core.enable = true;
 
-    systemd.services.nix-daemon.environment.all_proxy = "http://127.0.0.1:8082";
-    systemd.services.qubes-update-check.environment.all_proxy = "http://127.0.0.1:8082";
-
     services.resolved.enable = true;
     services.udev.packages = [config.services.qubes.core.networkingPackage];
 
