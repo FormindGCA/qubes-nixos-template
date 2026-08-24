@@ -24,7 +24,7 @@
   qubesLib = import ../lib.nix {inherit lib fetchFromGitHub;};
   python = python3.withPackages (ps: [ps.pygobject3]);
   inherit (gst_all_1) gstreamer gst-plugins-base gst-plugins-good;
-  gstPluginPath = lib.makeSearchPath "lib/gstreamer-1.0" [gst-plugins-base gst-plugins-good];
+  gstPluginPath = lib.makeSearchPath "lib/gstreamer-1.0" [gstreamer gst-plugins-base gst-plugins-good];
   pythonEnv = ''
     --set PYTHONPATH "${qubes-core-qubesdb}/${python3.sitePackages}" \
     --prefix LD_LIBRARY_PATH : "${qubes-core-qubesdb}/lib:${qubes-core-vchan-xen}/lib" \
@@ -113,6 +113,9 @@ in
         --prefix PATH : "${coreutils}/bin:${qubes-core-qubesdb}/bin" \
         ${pythonEnv}
       patchShebangs "$out"
+
+      GST_PLUGIN_SYSTEM_PATH_1_0=${gstPluginPath} ${gstreamer}/bin/gst-inspect-1.0 \
+        queue ximagesrc videoconvert fdsink fdsrc rawvideoparse v4l2sink >/dev/null
     '';
 
     meta = qubesLib.meta "Securely stream webcams and share screens across Qubes VMs";
