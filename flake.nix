@@ -24,6 +24,7 @@
       qubes-gui-common = prev.callPackage ./pkgs/qubes-gui-common { rev = qubesBranch; };
       qubes-gui-agent-linux = prev.callPackage ./pkgs/qubes-gui-agent-linux { rev = qubesBranch; };
       qubes-usb-proxy = prev.callPackage ./pkgs/qubes-usb-proxy { rev = qubesBranch; };
+      qubes-video-companion = prev.callPackage ./pkgs/qubes-video-companion {};
       qubes-gpg-split = prev.callPackage ./pkgs/qubes-gpg-split {};
     };
     pkgs = import nixpkgs {
@@ -44,6 +45,7 @@
         ./modules/qubes/sshd.nix
         ./modules/qubes/updates.nix
         ./modules/qubes/usb.nix
+        ./modules/qubes/video-companion.nix
       ];
     };
     nixosProfiles.default = {

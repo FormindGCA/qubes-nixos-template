@@ -116,3 +116,7 @@ done
 # split-gpg publishes tags but has no release4.x branch.
 qubesBranch="" update_package "v([0-9.]+)" \
   qubes-gpg-split qubes-app-linux-split-gpg pkgs/qubes-gpg-split
+
+# video-companion publishes Qubes-versioned tags but has no release4.x branch.
+qubesBranch="" update_package "v(${qubesVersionRegex}\.[0-9.]+-[0-9]+)" \
+  qubes-video-companion qubes-video-companion pkgs/qubes-video-companion

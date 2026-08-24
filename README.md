@@ -85,6 +85,16 @@ services.qubes.gpgSplit = {
 
 Dom0 policy must allow the client to call `qubes.Gpg` and `qubes.GpgImportKey` in the key-holder qube. Select the target through `/rw/config/gpg-split-domain` or through the dom0 policy default.
 
+### Video Companion
+
+Enable the VM-side Qubes Video Companion services and tools with:
+
+```nix
+services.qubes.videoCompanion.enable = true;
+```
+
+This also installs `v4l-utils` and loads `v4l2loopback` with dynamic device creation enabled. Install the separate `qubes-video-companion-dom0` package in dom0 to provide its qrexec policy and dom0-side integration.
+
 ### SSH Git Proxy
 
 The standard Qubes updates proxy does not allow HTTP CONNECT to SSH ports. A dedicated proxy qube can expose `qubes.SshProxy` through tinyproxy configured with `ConnectPort 22` and any other required SSH ports.
