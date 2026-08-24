@@ -9,6 +9,7 @@ with lib; {
 
   config = mkIf config.services.qubes.usb.enable {
     environment.systemPackages = [pkgs.usbutils];
+    services.qubes.core.etcPackages = [pkgs.qubes-usb-proxy];
     services.qubes.qrexec.enable = true;
     services.qubes.qrexec.packages = [pkgs.qubes-usb-proxy];
     services.udev.packages = [

@@ -24,14 +24,12 @@
   qubesLib = import ../lib.nix {inherit lib fetchFromGitHub;};
   python = python3.withPackages (ps: [ps.pygobject3]);
   inherit (gst_all_1) gstreamer gst-plugins-base gst-plugins-good;
+  gstPluginPath = lib.makeSearchPath "lib/gstreamer-1.0" [gst-plugins-base gst-plugins-good];
   pythonEnv = ''
     --set PYTHONPATH "${qubes-core-qubesdb}/${python3.sitePackages}" \
     --prefix LD_LIBRARY_PATH : "${qubes-core-qubesdb}/lib:${qubes-core-vchan-xen}/lib" \
     --prefix GI_TYPELIB_PATH : "$GI_TYPELIB_PATH" \
-    --set GST_PLUGIN_SYSTEM_PATH_1_0 "${lib.makeSearchPath "lib/gstreamer-1.0" [
-      gst-plugins-base
-      gst-plugins-good
-    ]}" \
+    --set GST_PLUGIN_SYSTEM_PATH_1_0 "${gstPluginPath}" \
     --prefix PATH : "${coreutils}/bin"
   '';
 in
@@ -69,14 +67,13 @@ in
 
       mv "$out/usr/lib/systemd" "$out/lib/systemd"
       mv "$out/usr/lib/udev/rules.d/80-qubes-video-companion.rules" "$out/lib/udev/rules.d/"
-      mv "$out/usr/lib/modprobe.d" "$out/lib/modprobe.d"
       rm -rf "$out/usr" "$out/etc/sudoers.d" "$out/etc/privleap" "$out/etc/dkms"
 
       substituteInPlace "$out/bin/qubes-video-companion" \
-      --replace-fail /usr/share/qubes-video-companion "$out/share/qubes-video-companion" \
-      --replace-fail qrexec-client-vm "${qubes-core-qrexec}/bin/qrexec-client-vm" \
-      --replace-fail 'opts=$(getopt ' 'opts=$(${util-linux}/bin/getopt ' \
-      --replace-fail 'set -u -e' $'set -u -e\nexport GST_PLUGIN_SYSTEM_PATH_1_0=${lib.makeSearchPath "lib/gstreamer-1.0" [gst-plugins-base gst-plugins-good]}'
+        --replace-fail /usr/share/qubes-video-companion "$out/share/qubes-video-companion" \
+        --replace-fail qrexec-client-vm "${qubes-core-qrexec}/bin/qrexec-client-vm" \
+        --replace-fail 'opts=$(getopt ' 'opts=$(${util-linux}/bin/getopt ' \
+        --replace-fail 'set -u -e' $'set -u -e\nexport GST_PLUGIN_SYSTEM_PATH_1_0=${gstPluginPath}'
       substituteInPlace "$out/share/qubes-video-companion/receiver/receiver.py" \
         --replace-fail /usr/bin/gst-launch-1.0 "${gstreamer}/bin/gst-launch-1.0"
       substituteInPlace "$out/share/qubes-video-companion/receiver/destroy.py" \

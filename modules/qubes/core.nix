@@ -42,6 +42,11 @@ in
         defaultText = literalExpression "pkgs.qubes-core-agent-linux";
         default = pkgs.qubes-core-agent-linux;
       };
+      etcPackages = mkOption {
+        type = types.listOf types.package;
+        default = [];
+        description = "Additional packages containing files for /etc/qubes.";
+      };
       networkingPackage = mkOption {
         type = types.package;
         description = "Networking-enabled qubes-core-agent-linux package used only by Qubes networking services.";
@@ -52,6 +57,10 @@ in
     config = mkIf cfg.enable (
       let
         qubes-core-agent-linux = cfg.basePackage;
+        qubesEtcDirectory = pkgs.symlinkJoin {
+          name = "qubes-etc";
+          paths = ["${cfg.basePackage}/etc/qubes"] ++ map (package: "${package}/etc/qubes") cfg.etcPackages;
+        };
         userHome =
           if cfg.user.home != null
           then cfg.user.home
@@ -158,7 +167,7 @@ in
         environment.systemPackages = [
           qubes-core-agent-linux
         ];
-        environment.etc."qubes".source = "${qubes-core-agent-linux}/etc/qubes";
+        environment.etc."qubes".source = qubesEtcDirectory;
         services.udev.packages = [
           pkgs.qubes-linux-utils
           qubes-core-agent-linux

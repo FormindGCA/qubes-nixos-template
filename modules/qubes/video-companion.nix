@@ -12,15 +12,11 @@ in {
   config = lib.mkIf config.services.qubes.videoCompanion.enable {
     services.qubes.qrexec.enable = true;
     services.qubes.qrexec.packages = [package];
+    services.qubes.core.etcPackages = [package];
     services.udev.packages = [package];
     systemd.packages = [package];
 
     environment.systemPackages = [package pkgs.v4l-utils];
-    environment.etc = {
-      "qubes/rpc-config/qvc.Webcam".source = "${package}/etc/qubes/rpc-config/qvc.Webcam";
-      "qubes/rpc-config/qvc.ScreenShare".source = "${package}/etc/qubes/rpc-config/qvc.ScreenShare";
-    };
-
     boot.kernelModules = ["v4l2loopback"];
     boot.extraModprobeConfig = "options v4l2loopback devices=0";
   };
