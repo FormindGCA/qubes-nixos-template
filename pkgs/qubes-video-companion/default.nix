@@ -35,12 +35,12 @@
 in
   stdenv.mkDerivation rec {
     pname = "qubes-video-companion";
-    version = "4.3.3-1";
+    version = "4.3.5-1";
 
     src = qubesLib.fetchFromQubes {
       repo = pname;
       inherit version;
-      hash = "sha256-u6Zn8x2+Ij5ezlaNHa+kpuGeYBXlK2dDNqYVSZA5fhc=";
+  hash = "sha256-KHOryKNTi2jsRAdHb1WXAhJPdrjAJ2QGgE0wKQw4h+A=";
     };
 
     nativeBuildInputs = [makeWrapper pandoc python wrapGAppsNoGuiHook];
