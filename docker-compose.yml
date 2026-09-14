@@ -3,6 +3,7 @@ services:
     build: .
     working_dir: /workspace
     volumes:
+      - .:/workspace
       - qubes-nix-store:/nix
       - qubes-nix-cache:/root/.cache/nix
     environment:

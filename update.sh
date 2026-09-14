@@ -67,7 +67,7 @@ update_package() {
   local version
   local hash
 
-  current_version="$(sed -n -E 's|^  version = "([^"]*)";|\1|p' "$pin_file")"
+  current_version="$(sed -n -E 's|^[[:space:]]+version = "([^"]*)";|\1|p' "$pin_file")"
   current_hash="$(sed -n -E 's|^ +hash = "([^"]*)";|\1|p' "$pin_file")"
   [[ -n "$current_version" && -n "$current_hash" ]] || {
     printf 'unable to read package pin from %s\n' "$pin_file" >&2
@@ -90,7 +90,7 @@ update_package() {
   printf '[+] Update available: %s %s -> %s\n' "$package" "$current_version" "$version"
   printf '    hash: %s -> %s\n' "$current_hash" "$hash"
   sed -i -E \
-    -e "s|^  version = \"[^\"]*\";|  version = \"$version\";|" \
+    -e "s|^([[:space:]]+)version = \"[^\"]*\";|\1version = \"$version\";|" \
     -e "s|^   *hash = \"[^\"]*\";|  hash = \"$hash\";|" \
     "$pin_file"
   printf '    applied: %s\n' "$pin_file"
