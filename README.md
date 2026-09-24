@@ -48,6 +48,38 @@ The ISO installs into a fresh HVM TemplateVM without first installing an RPM in 
 
 The minimal RPM configuration is in `examples/`. Larger TemplateVM, qrexec Nix cache, and mission-specific flake examples are documented in `examples/variants/README.md`.
 
+### User shell and new-home skeleton
+
+`services.qubes.core.user.shell` defaults to Bash and
+`services.qubes.core.user.skeletonDirectory` defaults to `/var/empty`.
+Consumers can select Zsh and use their Home Manager generation as the skeleton:
+
+```nix
+{ config, pkgs, ... }:
+let user = config.services.qubes.core.user.name;
+in {
+  programs.zsh.enable = true;
+  services.qubes.core.user = {
+    shell = pkgs.zsh;
+    skeletonDirectory = "${config.home-manager.users.${user}.home.activationPackage}/home-files";
+  };
+}
+```
+
+The consuming project must import and configure Home Manager itself. The
+template exposes the skeleton through `/etc/qubes-home-skel` and uses the
+existing Qubes home initializer. Files are seeded for new homes; existing homes
+are left alone in `ifneeded` mode. Symlinked skeletons are copied as directories,
+preserving managed file links while making home directories writable. Keep
+history, credentials, and other mutable state out of the skeleton.
+
+If overriding `services.qubes.core.basePackage`, that package must also use
+`skeletonDirectory = "/etc/qubes-home-skel"` to honor a custom skeleton.
+The default base package handles this automatically without depending on the
+Home Manager generation at build time.
+
+Test the packaged initializer with `nix build .#checks.x86_64-linux.home-skeleton`.
+
 ### Qubes Updater
 
 The updater uses the VM hostname as the flake configuration name. Set an explicit name when a cloned or renamed template does not match the flake output:

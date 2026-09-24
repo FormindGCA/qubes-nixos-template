@@ -32,6 +32,7 @@
       overlays = [qubesPackages];
     };
   in rec {
+    checks.${system}.home-skeleton = import ./tests/home-skeleton.nix { inherit pkgs; };
     overlays.default = qubesPackages;
     nixosModules.default = {
       imports = [

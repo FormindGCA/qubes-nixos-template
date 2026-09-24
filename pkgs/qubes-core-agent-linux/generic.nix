@@ -52,6 +52,7 @@
   nftables,
   conntrack-tools,
   enableNetworking ? false,
+  skeletonDirectory ? "/var/empty",
   version,
   hash,
   rev ? null,
@@ -216,8 +217,13 @@ in
         mkdir -p "$out/lib/qubes-bind-dirs.d"
         install -m 0644 "filesystem/30_cron.conf" "$out/lib/qubes-bind-dirs.d/30_cron.conf"
 
-        # nixos does not have /etc/skel, initialize_home() requires it
-        substituteInPlace "$out/lib/qubes/init/functions" --replace-fail "/etc/skel" "/var/empty"
+        # Keep the default empty skeleton; deployments may supply a runtime
+        # /etc path so the agent does not depend on a Home Manager generation.
+        substituteInPlace "$out/lib/qubes/init/functions" \
+          --replace-fail 'cp "-af$enable_selinux" -T /etc/skel "$home_root/$homedirwithouthome"' \
+            'cp "-af$enable_selinux" -T /etc/skel/. "$home_root/$homedirwithouthome" || return 73
+            find "$home_root/$homedirwithouthome" -type d -exec chmod u+rwx {} + || return 73' \
+          --replace-fail "/etc/skel" ${lib.escapeShellArg skeletonDirectory}
 
         # Fixup paths
         substituteInPlace "$out/bin/qubes-session-autostart" --replace-fail "QUBES_XDG_CONFIG_DROPINS = '/etc/qubes/autostart'" "QUBES_XDG_CONFIG_DROPINS = \"$out/etc/qubes/autostart\""

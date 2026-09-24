@@ -35,12 +35,25 @@ in
           default = true;
           description = "Whether to autologin the default Qubes user on getty.";
         };
+        shell = mkOption {
+          type = types.package;
+          default = pkgs.bash;
+          defaultText = literalExpression "pkgs.bash";
+          description = "Login shell for the Qubes user. Enable its NixOS program module in the consuming configuration.";
+        };
+        skeletonDirectory = mkOption {
+          type = types.path;
+          default = "/var/empty";
+          description = "Initial files for new Qubes homes, exposed through /etc/qubes-home-skel. Existing homes are not overwritten.";
+        };
       };
       basePackage = mkOption {
         type = types.package;
         description = "Base qubes-core-agent-linux package used for generic core services and qrexec RPCs.";
         defaultText = literalExpression "pkgs.qubes-core-agent-linux";
-        default = pkgs.qubes-core-agent-linux;
+        default = if cfg.user.skeletonDirectory == "/var/empty"
+          then pkgs.qubes-core-agent-linux
+          else pkgs.qubes-core-agent-linux.override { skeletonDirectory = "/etc/qubes-home-skel"; };
       };
       etcPackages = mkOption {
         type = types.listOf types.package;
@@ -85,7 +98,7 @@ in
           home = userHome;
           isNormalUser = true;
           password = "";
-          shell = pkgs.bash;
+           shell = cfg.user.shell;
           uid = cfg.user.uid;
         };
         security.sudo.wheelNeedsPassword = false;
@@ -168,6 +181,9 @@ in
           qubes-core-agent-linux
         ];
         environment.etc."qubes".source = qubesEtcDirectory;
+        environment.etc."qubes-home-skel" = mkIf (cfg.user.skeletonDirectory != "/var/empty") {
+          source = cfg.user.skeletonDirectory;
+        };
         services.udev.packages = [
           pkgs.qubes-linux-utils
           qubes-core-agent-linux
