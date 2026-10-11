@@ -6,7 +6,7 @@
 
   fonts.enableDefaultPackages = true;
 
-  hardware.firmware = [pkgs.linux-firmware];
+  hardware.firmware = [ pkgs.linux-firmware pkgs.wireless-regdb ];
   # Qubes supplies the running kernel, so its firmware compression support is unknown.
   hardware.firmwareCompression = lib.mkDefault "none";
 
