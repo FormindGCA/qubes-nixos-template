@@ -1,10 +1,14 @@
-{
+{lib, pkgs, ...}: {
   services.qubes.qrexec.enable = true;
   services.qubes.gui.enable = true;
   services.qubes.networking.enable = true;
   services.qubes.usb.enable = true;
 
   fonts.enableDefaultPackages = true;
+
+  hardware.firmware = [pkgs.linux-firmware];
+  # Qubes supplies the running kernel, so its firmware compression support is unknown.
+  hardware.firmwareCompression = lib.mkDefault "none";
 
   # When running in PVH mode, the qubes init script will bind mount the kernel modules here
   systemd.tmpfiles.rules = [
